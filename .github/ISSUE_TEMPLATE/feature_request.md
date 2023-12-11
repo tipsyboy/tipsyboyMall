@@ -10,7 +10,5 @@ assignees: ''
 🔨 Description
 
 
-✅Task
-- [] todo1
-- [] todo2
-- [] todo3
+✅Tasks
+- [ ] todo1
