@@ -20,6 +20,7 @@ public class ItemApiController {
 
     @PostMapping("/items")
     public ResponseEntity<Void> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto) {
+        // 이슈 클로징 테스트중입니다.
         itemService.saveItem(itemCreateDto);
         return ResponseEntity.ok().build();
     }
