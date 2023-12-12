@@ -1,12 +1,8 @@
 package study.tipsyboy.tipsyboyMall.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import study.tipsyboy.tipsyboyMall.common.exception.response.ErrorResponse;
 
@@ -14,6 +10,7 @@ import study.tipsyboy.tipsyboyMall.common.exception.response.ErrorResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> baseExceptionHandler(BaseException e) {
         log.error("[Base Exception] Type:{}", e.getExceptionType());
 

@@ -10,6 +10,8 @@ import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -112,8 +114,9 @@ class ItemServiceTest {
         itemRepository.save(item);
 
         // expected
-        assertThrows(IllegalArgumentException.class, ()
-                        -> itemService.getItemById(item.getId() + 1L));
+        ItemException itemException = assertThrows(ItemException.class, ()
+                -> itemService.getItemById(item.getId() + 1L));
+        assertEquals(ItemExceptionType.ITEM_NOT_FOUND, itemException.getExceptionType());
     }
 
     @Test
@@ -139,7 +142,7 @@ class ItemServiceTest {
         itemService.edit(item.getId(), itemUpdateDto);
 
         Item findItem = itemRepository.findById(item.getId())
-                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+                .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
         // then
         assertEquals("변경 상품", findItem.getItemName());

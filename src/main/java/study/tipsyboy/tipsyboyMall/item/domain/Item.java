@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 
 @Getter
 @NoArgsConstructor
@@ -51,7 +53,7 @@ public class Item extends BaseTimeEntity {
 
     public void removeStock(int count) {
         if (this.stock < count) {
-            throw new IllegalArgumentException("상품 재고가 없습니다.");
+            throw new ItemException(ItemExceptionType.ITEM_NOT_ENOUGH);
         }
         this.stock -= count;
     }

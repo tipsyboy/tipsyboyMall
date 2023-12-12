@@ -1,6 +1,7 @@
 package study.tipsyboy.tipsyboyMall.item.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
@@ -9,10 +10,13 @@ import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -33,7 +37,7 @@ public class ItemService {
 
     public ItemResponseDto getItemById(Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
         return ItemResponseDto.builder()
                 .itemName(item.getItemName())
@@ -52,7 +56,7 @@ public class ItemService {
     @Transactional
     public void edit(Long itemId, ItemUpdateDto itemUpdateDto) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
         ItemEditor.ItemEditorBuilder editorBuilder = item.toEditor();
         ItemEditor itemEditor = editorBuilder
@@ -68,7 +72,7 @@ public class ItemService {
     @Transactional
     public void delete(Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
         itemRepository.delete(item);
     }
 

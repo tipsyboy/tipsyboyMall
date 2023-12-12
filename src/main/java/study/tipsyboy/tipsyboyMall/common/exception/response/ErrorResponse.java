@@ -1,10 +1,12 @@
 package study.tipsyboy.tipsyboyMall.common.exception.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class ErrorResponse {
 
     private final String statusCode;
