@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,10 @@ public class Order extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
     public Order(OrderStatus orderStatus, List<OrderItem> orderItems) {
