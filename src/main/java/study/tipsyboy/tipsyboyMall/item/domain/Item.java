@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
 
 @Getter
 @NoArgsConstructor
 @Entity
-public class Item {
+public class Item extends BaseTimeEntity {
 
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
