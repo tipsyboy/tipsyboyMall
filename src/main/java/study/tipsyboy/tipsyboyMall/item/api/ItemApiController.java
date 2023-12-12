@@ -17,7 +17,7 @@ import java.util.List;
 public class ItemApiController {
 
     private final ItemService itemService;
-
+    // merge Test 중입니다.
     @PostMapping("/items")
     public ResponseEntity<Void> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto) {
         itemService.saveItem(itemCreateDto);
