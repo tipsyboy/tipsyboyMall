@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
@@ -57,6 +58,10 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @WithMockUser(
+            username = "tipsyboy@gmail.com",
+            roles = {"MEMBER"}
+    )
     @DisplayName("주문 실패 - 등록되지 않은 상품")
     public void orderFailureItemNotFound() throws Exception {
         // expected
@@ -80,6 +85,10 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @WithMockUser(
+            username = "tipsyboy@gmail.com",
+            roles = {"MEMBER"}
+    )
     @DisplayName("주문 실패 - 재고 부족")
     public void createOrderFailure() throws Exception {
         // given
@@ -119,6 +128,10 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @WithMockUser(
+            username = "tipsyboy@gmail.com",
+            roles = {"MEMBER"}
+    )
     @DisplayName("주문 성공")
     public void createOrder() throws Exception {
         // given
@@ -161,6 +174,10 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @WithMockUser(
+            username = "tipsyboy@gmail.com",
+            roles = {"MEMBER"}
+    )
     @DisplayName("주문을 취소한다.")
     public void cancelOrder() throws Exception {
         // given
