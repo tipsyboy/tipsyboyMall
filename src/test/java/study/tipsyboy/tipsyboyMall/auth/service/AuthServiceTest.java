@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
@@ -22,6 +23,9 @@ class AuthServiceTest {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @AfterEach
     public void after() {
@@ -99,6 +103,6 @@ class AuthServiceTest {
         assertEquals("tipsyboy@gmail.com", findMember.getEmail());
         assertEquals("간술맨", findMember.getNickname());
         assertEquals(MemberRole.MEMBER, findMember.getMemberRole());
-        assertEquals("1234", findMember.getPassword());
+        assertTrue(passwordEncoder.matches("1234", findMember.getPassword()));
     }
 }

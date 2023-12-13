@@ -2,6 +2,7 @@ package study.tipsyboy.tipsyboyMall.auth.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
@@ -17,6 +18,7 @@ import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Long signup(SignupRequestDto signupRequestDto) {
 
@@ -31,7 +33,7 @@ public class AuthService {
         Member member = Member.builder()
                 .email(signupRequestDto.getEmail())
                 .nickname(signupRequestDto.getNickname())
-                .password(signupRequestDto.getPassword())
+                .password(passwordEncoder.encode(signupRequestDto.getPassword()))
                 .memberRole(MemberRole.MEMBER)
                 .build();
         memberRepository.save(member);
