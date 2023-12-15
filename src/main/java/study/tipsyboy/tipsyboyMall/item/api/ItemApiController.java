@@ -3,6 +3,7 @@ package study.tipsyboy.tipsyboyMall.item.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
@@ -17,8 +18,9 @@ import java.util.List;
 public class ItemApiController {
 
     private final ItemService itemService;
-    // merge Test 중입니다.
+
     @PostMapping("/items")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto) {
         itemService.saveItem(itemCreateDto);
         return ResponseEntity.ok().build();
@@ -35,6 +37,7 @@ public class ItemApiController {
     }
 
     @PatchMapping("/items/{itemId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> editItem(@PathVariable Long itemId,
                                          @RequestBody ItemUpdateDto itemUpdateDto) {
 
@@ -43,6 +46,7 @@ public class ItemApiController {
     }
 
     @DeleteMapping("/items/{itemId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
         itemService.delete(itemId);
         return ResponseEntity.ok().build();

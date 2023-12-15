@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
@@ -43,10 +43,7 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser
     @DisplayName("상품을 등록한다.")
     public void saveItem() throws Exception {
         // given
@@ -68,10 +65,6 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
     @DisplayName("한 개의 상품을 조회한다.")
     public void getItemOne() throws Exception {
         // given
@@ -95,10 +88,6 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
     @DisplayName("모든 상품을 조회한다.")
     public void getAllItems() throws Exception {
         // given
@@ -120,10 +109,7 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser
     @DisplayName("상품 등록시 Bean-Validation을 수행한다.")
     public void itemCreateBeanValidationFail() throws Exception {
         // TODO: 좀 더 자세한 테스트 작성
@@ -143,10 +129,6 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
     @DisplayName("존재 하지 않는 상품을 조회한다.")
     public void readNotFoundItem() throws Exception {
         // expected
@@ -157,10 +139,7 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser
     @DisplayName("상품 정보를 수정한다.")
     public void updateItem() throws Exception {
         // given
@@ -187,10 +166,7 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser
     @DisplayName("상품을 삭제한다.")
     public void deleteItem() throws Exception {
         // given

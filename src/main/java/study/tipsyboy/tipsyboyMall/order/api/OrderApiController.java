@@ -4,6 +4,7 @@ package study.tipsyboy.tipsyboyMall.order.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
@@ -18,11 +19,12 @@ public class OrderApiController {
     private final OrderService orderService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<OrderInfoResponseDto> createOrder(@RequestBody OrderCreateDto orderCreateDto) {
         return ResponseEntity.ok(orderService.order(orderCreateDto));
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/{orderId}") // TODO: ADMIN OR MEMBERS with permissions to view
     public ResponseEntity<OrderInfoResponseDto> getOrderInfo(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.findOrderById(orderId));
     }
