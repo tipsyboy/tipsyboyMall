@@ -5,6 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
@@ -31,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderServiceTest {
 
     @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
@@ -41,14 +49,18 @@ class OrderServiceTest {
 
     @AfterEach
     public void after() {
+        memberRepository.deleteAll();
         orderRepository.deleteAll();
         itemRepository.deleteAll();
     }
 
     @Test
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 정보를 받아서 주문을 생성, 주문이 생성되고 상품의 재고가 줄어든다.")
     public void createOrder() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
+
         List<Item> items = IntStream.range(1, 4)
                 .mapToObj(i -> Item.builder()
                         .itemName("item" + i)
@@ -68,7 +80,7 @@ class OrderServiceTest {
         OrderCreateDto orderCreateDto = OrderCreateDto.builder()
                 .orderInfo(orderInfo)
                 .build();
-        orderService.order(orderCreateDto);
+        orderService.order(member.getId(), orderCreateDto);
 
         // then
         Item orderedItem1 = itemRepository.findById(savedItem1.getId())
@@ -90,9 +102,12 @@ class OrderServiceTest {
 
 
     @Test
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 재고가 부족한 상품을 주문하면 예외가 발생한다.")
     public void orderItemNotEnough() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
+
         Item item = Item.builder()
                 .itemName("파나메라")
                 .price(2000)
@@ -109,15 +124,19 @@ class OrderServiceTest {
                 .build();
         // then
         ItemException exception = assertThrows(ItemException.class,
-                () -> orderService.order(orderCreateDto));
+                () -> orderService.order(member.getId(), orderCreateDto));
         assertEquals(ItemExceptionType.ITEM_NOT_ENOUGH, exception.getExceptionType());
     }
 
 
     @Test
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문을 취소하면 주문의 상태가 변경된다.")
     public void cancelOrderUpdatesStatus() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
+
         Item item = Item.builder()
                 .itemName("카이엔")
                 .price(2000)
@@ -134,6 +153,7 @@ class OrderServiceTest {
                         .build());
 
         Order order = Order.builder()
+                .member(member)
                 .orderItems(orderItems)
                 .orderStatus(OrderStatus.ORDER)
                 .build();
@@ -149,9 +169,12 @@ class OrderServiceTest {
     }
 
     @Test
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문을 취소하면 재고가 복구되어야 한다.")
     public void restoreStockAfterCancel() throws Exception {
         // given - 상품이 있고, 주문을 함
+        Member member = memberRepository.findAll().get(0);
+
         Item item = Item.builder()
                 .itemName("콰트로포르테")
                 .price(2000)
@@ -163,9 +186,11 @@ class OrderServiceTest {
         HashMap<Long, Integer> info = new HashMap<>(); // 주문서
         info.put(item.getId(), 1);
         OrderInfoResponseDto responseDto = orderService.order(
-                OrderCreateDto.builder()
-                        .orderInfo(info)
-                        .build());// 주문
+                        member.getId(),
+                        OrderCreateDto.builder()
+                                .orderInfo(info)
+                                .build()
+                );// 주문
 
         // when - 주문 취소
         orderService.cancelOrder(responseDto.getId());
@@ -177,9 +202,13 @@ class OrderServiceTest {
     }
 
     @Test
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 id로 주문 내역을 가져온다.")
     public void findOrderById() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
+
         Item item = Item.builder()
                 .itemName("벤츠 S 클래스")
                 .price(2000)
@@ -194,6 +223,7 @@ class OrderServiceTest {
                 .count(1)
                 .build();
         Order order = Order.builder()
+                .member(member)
                 .orderItems(List.of(orderItem))
                 .orderStatus(OrderStatus.ORDER)
                 .build();

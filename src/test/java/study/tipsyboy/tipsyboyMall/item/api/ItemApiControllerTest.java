@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
@@ -37,8 +38,12 @@ class ItemApiControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @AfterEach
     public void after() {
+        memberRepository.deleteAll();
         itemRepository.deleteAll();
     }
 

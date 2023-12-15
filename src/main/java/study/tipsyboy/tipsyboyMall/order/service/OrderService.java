@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
+import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
+import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
@@ -28,15 +32,20 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
+    private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
     private final OrderRepository orderRepository;
 
     @Transactional
-    public OrderInfoResponseDto order(OrderCreateDto orderCreateDto) {
+    public OrderInfoResponseDto order(Long memberId, OrderCreateDto orderCreateDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
         List<OrderItem> orderItems = orderCreateDto.getOrderInfo().entrySet().stream()
                 .map(this::createOrderItem)
                 .collect(Collectors.toList());
         Order order = Order.builder()
+                .member(member)
                 .orderItems(orderItems)
                 .orderStatus(OrderStatus.ORDER)
                 .build();
