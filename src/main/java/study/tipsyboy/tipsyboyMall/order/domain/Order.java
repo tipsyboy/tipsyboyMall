@@ -33,7 +33,8 @@ public class Order extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Order(OrderStatus orderStatus, List<OrderItem> orderItems) {
+    public Order(OrderStatus orderStatus, List<OrderItem> orderItems, Member member) {
+        setMember(member);
         this.orderStatus = orderStatus;
         for (OrderItem orderItem : orderItems) {
             this.addOrderItems(orderItem);
@@ -49,5 +50,14 @@ public class Order extends BaseTimeEntity {
     private void addOrderItems(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.connectOrder(this);
+    }
+
+    public Long getMemberId() {
+        return this.getMember().getId();
+    }
+
+    private void setMember(Member member) {
+        this.member = member;
+        member.getOrderList().add(this);
     }
 }

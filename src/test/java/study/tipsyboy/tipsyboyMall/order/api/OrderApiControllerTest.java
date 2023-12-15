@@ -9,7 +9,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
@@ -42,6 +45,9 @@ class OrderApiControllerTest {
     private OrderService orderService;
 
     @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
@@ -52,6 +58,7 @@ class OrderApiControllerTest {
 
     @AfterEach
     public void after() {
+        memberRepository.deleteAll();
         orderRepository.deleteAll();
         itemRepository.deleteAll();
     }
@@ -164,10 +171,12 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @Transactional
     @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문을 취소한다.")
     public void cancelOrder() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
         Item item = Item.builder()
                 .itemName("피자 먹고싶다.")
                 .price(10000)
@@ -185,6 +194,7 @@ class OrderApiControllerTest {
         Order order = Order.builder()
                 .orderItems(List.of(orderItem))
                 .orderStatus(OrderStatus.ORDER)
+                .member(member)
                 .build();
         orderRepository.save(order);
 
