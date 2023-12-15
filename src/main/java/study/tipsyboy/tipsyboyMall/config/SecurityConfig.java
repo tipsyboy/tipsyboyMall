@@ -53,9 +53,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
 
                 .addFilterBefore(
                         authenticationProcessingFilter(),

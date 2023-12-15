@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -58,10 +57,7 @@ class OrderApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문 실패 - 등록되지 않은 상품")
     public void orderFailureItemNotFound() throws Exception {
         // expected
@@ -85,10 +81,7 @@ class OrderApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문 실패 - 재고 부족")
     public void createOrderFailure() throws Exception {
         // given
@@ -128,10 +121,7 @@ class OrderApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문 성공")
     public void createOrder() throws Exception {
         // given
@@ -174,10 +164,7 @@ class OrderApiControllerTest {
     }
 
     @Test
-    @WithMockUser(
-            username = "tipsyboy@gmail.com",
-            roles = {"MEMBER"}
-    )
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문을 취소한다.")
     public void cancelOrder() throws Exception {
         // given
