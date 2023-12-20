@@ -1,5 +1,5 @@
 <script setup lang="ts"></script>
 
 <template>
-  <main>메인페이지</main>
+  <main>회원가입 페이지</main>
 </template>
