@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
+import router from '@/router'
 
 const form = ref({
   email: '',
@@ -27,10 +28,17 @@ const form = ref({
 })
 
 const signup = () => {
-  axios.post('http://localhost:8080/auth/signup', {
-    email: form.value.email,
-    password: form.value.password,
-    nickname: form.value.nickname
-  })
+  axios
+    .post('http://localhost:8080/auth/signup', {
+      email: form.value.email,
+      password: form.value.password,
+      nickname: form.value.nickname
+    })
+    .then(() => {
+      router.push({ name: 'home' })
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 }
 </script>
