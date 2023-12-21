@@ -1,4 +1,3 @@
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -8,8 +7,12 @@ import 'element-plus/dist/index.css'
 
 import "bootstrap/dist/css/bootstrap-utilities.css"
 
-const app = createApp(App)
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
+
+const app = createApp(App)
 app.use(router)
 app.use(ElementPlus)
+app.use(createPinia().use(piniaPluginPersistedstate))
 app.mount('#app')

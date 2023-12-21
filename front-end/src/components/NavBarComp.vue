@@ -11,13 +11,31 @@
       <el-menu-item index="/">Home</el-menu-item>
       <el-menu-item index="/order">Orders</el-menu-item>
       <div class="flex-grow" />
-      <el-menu-item index="/login">Login</el-menu-item>
-      <el-menu-item index="/signup">Sign-up</el-menu-item>
+      <template v-if="!memberStore.isLogin">
+        <el-menu-item index="/login">Login</el-menu-item>
+        <el-menu-item index="/signup">Sign up</el-menu-item>
+      </template>
+      <template v-else>
+        <el-menu-item
+          :index="{ name: 'profile', params: { nickname: memberStore.userInfo.nickname } }"
+        >
+          Profile
+        </el-menu-item>
+        <el-menu-item @click="logout">Logout</el-menu-item>
+      </template>
     </el-menu>
   </el-header>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import useMemberStore from '@/stores/memberInfo'
+
+const memberStore = useMemberStore()
+
+const logout = () => {
+  memberStore.logout()
+}
+</script>
 
 <style scoped>
 .navbar {

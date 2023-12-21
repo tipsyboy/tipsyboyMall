@@ -1,5 +1,6 @@
 package study.tipsyboy.tipsyboyMall.auth.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 
@@ -20,6 +21,15 @@ public class MemberInfoResponseDto {
         dto.email = entity.getEmail();
         dto.nickname = entity.getNickname();
         dto.role = entity.getMemberRole().getRole();
+        return dto;
+    }
+
+    public static MemberInfoResponseDto ofPrincipal(LoginMember loginMember) {
+        MemberInfoResponseDto dto = new MemberInfoResponseDto();
+        dto.id = loginMember.getMemberId();
+        dto.email = loginMember.getUsername();
+        dto.nickname = loginMember.getNickname();
+        dto.role = loginMember.getAuthorities().toString();
         return dto;
     }
 

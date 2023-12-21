@@ -29,4 +29,10 @@ public class MemberService {
                 .map(MemberInfoResponseDto::of)
                 .collect(Collectors.toList());
     }
+
+    public MemberInfoResponseDto findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname)
+                .map(MemberInfoResponseDto::of)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+    }
 }
