@@ -16,13 +16,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import useMemberStore from '@/stores/memberInfo'
 
 const form = ref({
   email: '',
   password: ''
 })
 
+const memberStore = useMemberStore()
 const login = () => {
-  console.log(form)
+  memberStore.login(form)
 }
 </script>
