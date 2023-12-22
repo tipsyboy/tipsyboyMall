@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
+import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
+import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemEditor;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
@@ -23,10 +27,15 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public void saveItem(ItemCreateDto itemCreateDto) {
+    public void saveItem(ItemCreateDto itemCreateDto, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
         Item item = Item.builder()
+                .member(member)
                 .itemName(itemCreateDto.getItemName())
                 .price(itemCreateDto.getPrice())
                 .stock(itemCreateDto.getStock())

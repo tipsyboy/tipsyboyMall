@@ -55,14 +55,20 @@ class OrderServiceTest {
     }
 
     @Test
-    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 정보를 받아서 주문을 생성, 주문이 생성되고 상품의 재고가 줄어든다.")
     public void createOrder() throws Exception {
         // given
-        Member member = memberRepository.findAll().get(0);
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
 
         List<Item> items = IntStream.range(1, 4)
                 .mapToObj(i -> Item.builder()
+                        .member(member)
                         .itemName("item" + i)
                         .price(i)
                         .stock(i)
@@ -102,13 +108,19 @@ class OrderServiceTest {
 
 
     @Test
-    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 재고가 부족한 상품을 주문하면 예외가 발생한다.")
     public void orderItemNotEnough() throws Exception {
         // given
-        Member member = memberRepository.findAll().get(0);
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
 
         Item item = Item.builder()
+                .member(member)
                 .itemName("파나메라")
                 .price(2000)
                 .stock(1)
@@ -130,14 +142,19 @@ class OrderServiceTest {
 
 
     @Test
-    @Transactional
-    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문을 취소하면 주문의 상태가 변경된다.")
     public void cancelOrderUpdatesStatus() throws Exception {
         // given
-        Member member = memberRepository.findAll().get(0);
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
 
         Item item = Item.builder()
+                .member(member)
                 .itemName("카이엔")
                 .price(2000)
                 .stock(3)
@@ -169,13 +186,19 @@ class OrderServiceTest {
     }
 
     @Test
-    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문을 취소하면 재고가 복구되어야 한다.")
     public void restoreStockAfterCancel() throws Exception {
         // given - 상품이 있고, 주문을 함
-        Member member = memberRepository.findAll().get(0);
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
 
         Item item = Item.builder()
+                .member(member)
                 .itemName("콰트로포르테")
                 .price(2000)
                 .stock(3)
@@ -202,14 +225,19 @@ class OrderServiceTest {
     }
 
     @Test
-    @Transactional
-    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 id로 주문 내역을 가져온다.")
     public void findOrderById() throws Exception {
         // given
-        Member member = memberRepository.findAll().get(0);
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
 
         Item item = Item.builder()
+                .member(member)
                 .itemName("벤츠 S 클래스")
                 .price(2000)
                 .stock(10)

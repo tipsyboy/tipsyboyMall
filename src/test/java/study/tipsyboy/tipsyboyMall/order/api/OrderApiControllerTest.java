@@ -88,11 +88,22 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @Transactional
     @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문 실패 - 재고 부족")
     public void createOrderFailure() throws Exception {
         // given
+        Member seller = memberRepository.findAll().get(0);
+        Member buyer = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(buyer);
+
         Item item = Item.builder()
+                .member(seller)
                 .itemName("아크로리버시티 반포")
                 .price(10000)
                 .stock(1)
@@ -128,12 +139,23 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @Transactional
     @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("주문 성공")
     public void createOrder() throws Exception {
         // given
+        Member seller = memberRepository.findAll().get(0);
+        Member buyer = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(buyer);
+
         List<Item> items = IntStream.range(1, 4)
                 .mapToObj(i -> Item.builder()
+                        .member(seller)
                         .itemName("item" + i)
                         .price(i)
                         .stock(i)
@@ -178,6 +200,7 @@ class OrderApiControllerTest {
         // given
         Member member = memberRepository.findAll().get(0);
         Item item = Item.builder()
+                .member(member)
                 .itemName("피자 먹고싶다.")
                 .price(10000)
                 .stock(5)

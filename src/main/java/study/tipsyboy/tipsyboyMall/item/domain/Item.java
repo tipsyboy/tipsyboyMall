@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
@@ -23,9 +24,13 @@ public class Item extends BaseTimeEntity {
     private int stock; // 재고
     private String description; // 상품
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member; // 판매자
 
     @Builder
-    public Item(String itemName, int price, int stock, String description) {
+    public Item(String itemName, int price, int stock, String description, Member member) {
+        setMember(member);
         this.itemName = itemName;
         this.price = price;
         this.stock = stock;
@@ -56,5 +61,14 @@ public class Item extends BaseTimeEntity {
             throw new ItemException(ItemExceptionType.ITEM_NOT_ENOUGH);
         }
         this.stock -= count;
+    }
+
+    private void setMember(Member member) {
+        this.member = member;
+        member.getItemList().add(this);
+    }
+
+    public Long getMemberId() {
+        return this.member.getId();
     }
 }
