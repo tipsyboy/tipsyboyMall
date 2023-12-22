@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
@@ -20,9 +22,10 @@ public class ItemApiController {
     private final ItemService itemService;
 
     @PostMapping("/items")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto) {
-        itemService.saveItem(itemCreateDto);
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
+    public ResponseEntity<Void> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto,
+                                         @AuthenticationPrincipal LoginMember loginMember) {
+        itemService.saveItem(itemCreateDto, loginMember.getMemberId());
         return ResponseEntity.ok().build();
     }
 
@@ -37,7 +40,7 @@ public class ItemApiController {
     }
 
     @PatchMapping("/items/{itemId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_MEMBER') && hasPermission(#itemId, 'ITEM', 'PATCH'))")
     public ResponseEntity<Void> editItem(@PathVariable Long itemId,
                                          @RequestBody ItemUpdateDto itemUpdateDto) {
 
@@ -46,7 +49,7 @@ public class ItemApiController {
     }
 
     @DeleteMapping("/items/{itemId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_MEMBER') && hasPermission(#itemId, 'ITEM', 'DELETE'))")
     public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
         itemService.delete(itemId);
         return ResponseEntity.ok().build();

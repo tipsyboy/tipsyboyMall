@@ -2,28 +2,31 @@ package study.tipsyboy.tipsyboyMall.config.permission;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
+import study.tipsyboy.tipsyboyMall.item.domain.Item;
+import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
+import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderException;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderExceptionType;
 
-import java.io.Serializable;
-
 @Slf4j
 @RequiredArgsConstructor
-public class OrderPermissionEvaluator implements PermissionEvaluator {
+public class OrderPermissionHandler implements PermissionHandler {
 
     private final OrderRepository orderRepository;
 
     @Override
-    public boolean hasPermission(Authentication authentication,
-                                 Serializable targetId,
-                                 String targetType,
-                                 Object permission) {
-        log.info("[Order - Permission Evaluator]");
+    public boolean supports(String targetType) {
+        return targetType.equals("ORDER");
+    }
+
+    @Override
+    public boolean hasPermission(Authentication authentication, Long targetId, String permission) {
+        log.info("[Order - Permission Handler]");
 
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
         Order order = orderRepository.findById((Long) targetId)
@@ -35,10 +38,5 @@ public class OrderPermissionEvaluator implements PermissionEvaluator {
         }
 
         return true;
-    }
-
-    @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        return false;
     }
 }

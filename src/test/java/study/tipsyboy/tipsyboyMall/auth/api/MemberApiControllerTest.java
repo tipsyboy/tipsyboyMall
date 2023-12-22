@@ -63,48 +63,48 @@ class MemberApiControllerTest {
 
     @Test
     @CustomWithMockUser
-    @DisplayName("Id 값을 통해 사용자 프로필 정보를 가져온다. - ADMIN 권한을 갖고 있을때")
+    @DisplayName("사용자 닉네임 값을 통해 프로필 정보를 가져온다. - ADMIN 권한을 갖고 있을때")
     public void getMemberProfileWithAdminRole() throws Exception {
         // given
         Member member = Member.builder()
                 .email("tipsyboy@gmail.com")
-                .nickname("간술맨")
+                .nickname("혼술맨")
                 .memberRole(MemberRole.MEMBER)
                 .password("1234")
                 .build();
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(get("/members/profile/{memberId}", member.getId())
+        mockMvc.perform(get("/members/profile/{nickname}", member.getNickname())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
                 .andExpect(jsonPath("$.email").value("tipsyboy@gmail.com"))
-                .andExpect(jsonPath("$.nickname").value("간술맨"))
+                .andExpect(jsonPath("$.nickname").value("혼술맨"))
                 .andExpect(jsonPath("$.role").value(MemberRole.MEMBER.getRole()))
                 .andDo(print());
     }
 
     @Test
     @CustomWithMockUser(memberRole = MemberRole.MEMBER)
-    @DisplayName("Id 값을 통해 사용자 프로필 정보를 가져온다. - MEMBER 권한을 갖고 있을때")
+    @DisplayName("사용자 닉네임을 통해 프로필 정보를 가져온다. - MEMBER 권한을 갖고 있을때")
     public void getMemberProfileWithMemberRole() throws Exception {
         // given
         Member member = Member.builder()
                 .email("tipsyboy@gmail.com")
-                .nickname("간술맨")
+                .nickname("혼술맨")
                 .memberRole(MemberRole.MEMBER)
                 .password("1234")
                 .build();
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(get("/members/profile/{memberId}", member.getId())
+        mockMvc.perform(get("/members/profile/{nickname}", member.getNickname())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
                 .andExpect(jsonPath("$.email").value("tipsyboy@gmail.com"))
-                .andExpect(jsonPath("$.nickname").value("간술맨"))
+                .andExpect(jsonPath("$.nickname").value("혼술맨"))
                 .andExpect(jsonPath("$.role").value(MemberRole.MEMBER.getRole()))
                 .andDo(print());
     }

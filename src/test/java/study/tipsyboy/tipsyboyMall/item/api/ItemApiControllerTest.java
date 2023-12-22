@@ -9,8 +9,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
@@ -52,6 +55,7 @@ class ItemApiControllerTest {
     @DisplayName("상품을 등록한다.")
     public void saveItem() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
         ItemCreateDto itemCreateDto = ItemCreateDto.builder()
                 .itemName("상품")
                 .price(2000)
@@ -73,11 +77,20 @@ class ItemApiControllerTest {
     @DisplayName("한 개의 상품을 조회한다.")
     public void getItemOne() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         Item item = Item.builder()
                 .itemName("상품")
                 .price(2000)
                 .stock(10)
                 .description("상품 설명입니다.")
+                .member(member)
                 .build();
         itemRepository.save(item);
 
@@ -96,8 +109,17 @@ class ItemApiControllerTest {
     @DisplayName("모든 상품을 조회한다.")
     public void getAllItems() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         List<Item> items = IntStream.range(0, 20)
                 .mapToObj(i -> Item.builder()
+                        .member(member)
                         .itemName("상품 " + i)
                         .price(i)
                         .stock(i)
@@ -144,11 +166,14 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @CustomWithMockUser
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품 정보를 수정한다.")
     public void updateItem() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
         Item item = Item.builder()
+                .member(member)
                 .itemName("상품")
                 .price(2000)
                 .stock(10)
@@ -171,11 +196,14 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @CustomWithMockUser
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
     @DisplayName("상품을 삭제한다.")
     public void deleteItem() throws Exception {
         // given
+        Member member = memberRepository.findAll().get(0);
         Item item = Item.builder()
+                .member(member)
                 .itemName("상품")
                 .price(2000)
                 .stock(10)

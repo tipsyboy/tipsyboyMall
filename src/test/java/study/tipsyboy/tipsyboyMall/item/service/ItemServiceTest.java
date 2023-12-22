@@ -5,6 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
+import study.tipsyboy.tipsyboyMall.auth.domain.Member;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
+import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
@@ -28,16 +32,28 @@ class ItemServiceTest {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
 
     @AfterEach
     public void after() {
         itemRepository.deleteAll();
+        memberRepository.deleteAll();
     }
 
     @Test
     @DisplayName("상품을 등록한다.")
     public void saveItem() {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         ItemCreateDto itemCreateDto = ItemCreateDto.builder()
                 .itemName("상품")
                 .price(2000)
@@ -46,7 +62,7 @@ class ItemServiceTest {
                 .build();
 
         // when
-        itemService.saveItem(itemCreateDto);
+        itemService.saveItem(itemCreateDto, member.getId());
 
         // then
         Item findItem = itemRepository.findAll().get(0);
@@ -61,7 +77,16 @@ class ItemServiceTest {
     @DisplayName("상품을 단건 조회한다.")
     public void getItemById() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         Item item = Item.builder()
+                .member(member)
                 .itemName("상품")
                 .price(2000)
                 .stock(10)
@@ -83,8 +108,17 @@ class ItemServiceTest {
     @DisplayName("전체 상품을 조회한다.")
     public void getItemAll() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         List<Item> items = IntStream.range(0, 20)
                 .mapToObj(i -> Item.builder()
+                        .member(member)
                         .itemName("상품 " + i)
                         .price(10000 + i)
                         .stock(i)
@@ -105,7 +139,16 @@ class ItemServiceTest {
     @DisplayName("상품 단건 조회에 실패한다. - 존재 하지 않는 상품")
     public void getOneItemFail() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         Item item = Item.builder()
+                .member(member)
                 .itemName("상품")
                 .price(2000)
                 .stock(10)
@@ -123,7 +166,16 @@ class ItemServiceTest {
     @DisplayName("상품의 정보를 변경한다.")
     public void updateItem() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         Item item = Item.builder()
+                .member(member)
                 .itemName("상품")
                 .price(2000)
                 .stock(10)
@@ -155,7 +207,16 @@ class ItemServiceTest {
     @DisplayName("상품을 삭제한다.")
     public void deleteItem() throws Exception {
         // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
         Item item = Item.builder()
+                .member(member)
                 .itemName("상품")
                 .price(2000)
                 .stock(10)
