@@ -10,6 +10,9 @@
     >
       <el-menu-item index="/">Home</el-menu-item>
       <el-menu-item index="/order">Orders</el-menu-item>
+      <el-menu-item index="/item/save">item</el-menu-item>
+      <el-menu-item index="/item/list">item list</el-menu-item>
+
       <div class="flex-grow" />
       <template v-if="!memberStore.isLogin">
         <el-menu-item index="/login">Login</el-menu-item>

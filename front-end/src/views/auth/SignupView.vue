@@ -1,16 +1,22 @@
 <template>
-  <el-form :model="form" label-width="120px" class="signupForm" style="max-width: 80%" status-icon>
-    <el-form-item label="email">
+  <h2>회원가입</h2>
+  <el-form :model="form" class="signupForm" label-width="90px" status-icon>
+    <el-form-item label="email" size="large">
       <el-input v-model="form.email" placeholder="이메일을 입력하세요." />
     </el-form-item>
-    <el-form-item label="password">
-      <el-input v-model="form.password" type="password" placeholder="비밀번호를 입력하세요." />
+    <el-form-item label="password" size="large">
+      <el-input
+        v-model="form.password"
+        type="password"
+        placeholder="비밀번호를 입력하세요."
+        show-password
+      />
     </el-form-item>
-    <el-form-item label="nickname">
+    <el-form-item label="nickname" size="large">
       <el-input v-model="form.nickname" placeholder="닉네임을 입력하세요." />
     </el-form-item>
 
-    <el-form-item>
+    <el-form-item size="large">
       <el-button type="primary" @click="signup()">회원가입</el-button>
     </el-form-item>
   </el-form>
@@ -42,3 +48,5 @@ const signup = () => {
     })
 }
 </script>
+
+<style scoped></style>

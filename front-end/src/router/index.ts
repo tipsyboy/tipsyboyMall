@@ -4,6 +4,9 @@ import SignupView from '@/views/auth/SignupView.vue'
 import LoginView from '@/views/auth/LoginView.vue'
 import ProfileView from '@/views/auth/ProfileView.vue'
 import OrderView from '@/views/orders/OrderView.vue'
+import ItemCreate from '@/views/item/ItemCreate.vue'
+import ItemDetail from '@/views/item/ItemDetail.vue'
+import ItemList from '@/views/item/ItemList.vue'
 
 
 const router = createRouter({
@@ -14,7 +17,7 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    // auth
+    // AUTH
     {
       path: '/signup',
       name: 'signup',
@@ -30,7 +33,23 @@ const router = createRouter({
       name: "profile",
       component: ProfileView
     },
-    //
+    // ITEM
+    {
+      path: '/item/save',
+      name: 'itemSave',
+      component: ItemCreate
+    },
+    {
+      path: '/item/:itemId',
+      name: 'itemDetail',
+      component: ItemDetail
+    },
+    {
+      path: '/item/list',
+      name: 'itemList',
+      component: ItemList
+    },
+    // ORDER
     {
       path: '/order',
       name: 'order',
