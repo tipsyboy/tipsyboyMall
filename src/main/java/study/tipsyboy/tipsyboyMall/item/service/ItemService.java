@@ -47,13 +47,7 @@ public class ItemService {
     public ItemResponseDto getItemById(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
-
-        return ItemResponseDto.builder()
-                .itemName(item.getItemName())
-                .price(item.getPrice())
-                .stock(item.getStock())
-                .description(item.getDescription())
-                .build();
+        return new ItemResponseDto(item);
     }
 
     public List<ItemResponseDto> getAllItems() {

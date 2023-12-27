@@ -23,6 +23,7 @@ public class Item extends BaseTimeEntity {
     private int price;
     private int stock; // 재고
     private String description; // 상품
+    private ItemStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -35,6 +36,7 @@ public class Item extends BaseTimeEntity {
         this.price = price;
         this.stock = stock;
         this.description = description;
+        this.status = ItemStatus.ON_SALE;
     }
 
     public ItemEditor.ItemEditorBuilder toEditor() {
