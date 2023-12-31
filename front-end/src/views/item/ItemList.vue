@@ -10,7 +10,7 @@
     <el-table-column prop="itemName" label="상품명" width="180"> </el-table-column>
     <el-table-column prop="status" label="상태" width="180" />
     <el-table-column prop="seller" label="작성자" width="180" />
-    <el-table-column :prop="['createdDate']" label="날짜">
+    <el-table-column :prop="'createdDate'" label="날짜">
       <template v-slot="{ row }">
         {{ formatDateTime(row.createdDate) }}
       </template>

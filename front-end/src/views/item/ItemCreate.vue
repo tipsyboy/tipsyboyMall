@@ -69,7 +69,7 @@ const validatePrice = (rule: any, value: any, callback: any) => {
 }
 
 const saveItem = async () => {
-  const response = await axios
+  await axios
     .post(
       'http://localhost:8080/items',
       {

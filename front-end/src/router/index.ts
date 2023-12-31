@@ -2,11 +2,17 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import SignupView from '@/views/auth/SignupView.vue'
 import LoginView from '@/views/auth/LoginView.vue'
-import ProfileView from '@/views/auth/ProfileView.vue'
+
 import OrderView from '@/views/orders/OrderView.vue'
+
+import ProfileView from '@/views/personal/ProfileView.vue'
+import MyItem from '@/views/personal/MyItem.vue'
+import MyOrder from '@/views/personal/MyOrder.vue'
+
 import ItemCreate from '@/views/item/ItemCreate.vue'
-import ItemDetail from '@/views/item/ItemDetail.vue'
 import ItemList from '@/views/item/ItemList.vue'
+import ItemDetail from '@/views/item/ItemDetail.vue'
+
 
 
 const router = createRouter({
@@ -17,7 +23,7 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    // AUTH
+    // auth
     {
       path: '/signup',
       name: 'signup',
@@ -28,28 +34,39 @@ const router = createRouter({
       name: 'login',
       component: LoginView
     },
+    // personal
     {
       path: "/profile/:nickname",
       name: "profile",
       component: ProfileView
     },
-    // ITEM
     {
-      path: '/item/save',
-      name: 'itemSave',
-      component: ItemCreate
+      path: "/profile/:nickname/my-item",
+      name: "my-item",
+      component: MyItem
     },
     {
-      path: '/item/:itemId',
-      name: 'itemDetail',
-      component: ItemDetail
+      path: "/profile/:nickname/my-order",
+      name: "my-order",
+      component: MyOrder
+    },
+    // items
+    {
+      path: '/item/save',
+      name: 'itemCreate',
+      component: ItemCreate
     },
     {
       path: '/item/list',
       name: 'itemList',
       component: ItemList
     },
-    // ORDER
+    {
+      path: '/item/:itemId',
+      name: 'itemDetail',
+      component: ItemDetail
+    },
+    // order
     {
       path: '/order',
       name: 'order',

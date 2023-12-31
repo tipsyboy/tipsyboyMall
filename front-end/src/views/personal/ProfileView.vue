@@ -1,15 +1,13 @@
 <template>
-  <el-descriptions :title="$route.params.nickname" direction="vertical" :column="2" border>
-    <el-descriptions-item label="Nickname">{{ userInfo.nickname }}</el-descriptions-item>
-    <el-descriptions-item label="Telephone">//TODO: 전화번호</el-descriptions-item>
+  <ProfileMenu :user-info="userInfo" />
+  <el-empty :image-size="150" />
+  <h2>{{ $route.params.nickname }}</h2>
+  <el-descriptions direction="vertical" :column="1" border>
     <el-descriptions-item label="E-mail">{{ userInfo.email }}</el-descriptions-item>
-    <el-descriptions-item label="Place" :span="2">//TODO: place</el-descriptions-item>
     <el-descriptions-item label="Remarks">
       <el-tag size="small">//TODO: School</el-tag>
     </el-descriptions-item>
-    <el-descriptions-item label="Address"
-      >// TODO: No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province
-    </el-descriptions-item>
+    <el-descriptions-item label="Address">// TODO: 주소 </el-descriptions-item>
   </el-descriptions>
 </template>
 
@@ -17,8 +15,9 @@
 import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-const userInfo = ref({ email: '', nickname: '' })
+import ProfileMenu from './ProfileMenu.vue'
 
+const userInfo = ref({ email: '', nickname: '' })
 const route = useRoute()
 onMounted(() => {
   axios

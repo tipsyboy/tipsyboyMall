@@ -8,7 +8,7 @@
 .content {
   height: calc(100vh - 60px);
   margin-top: 5%;
-  max-width: 60%;
-  margin-left: 20%;
+  max-width: 70%;
+  margin-left: 15%;
 }
 </style>
