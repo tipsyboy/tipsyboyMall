@@ -10,7 +10,6 @@
     >
       <el-menu-item index="/">Home</el-menu-item>
       <el-menu-item index="/order">Orders</el-menu-item>
-      <el-menu-item index="/item/save">item</el-menu-item>
       <el-menu-item index="/item/list">item list</el-menu-item>
 
       <div class="flex-grow" />
@@ -19,12 +18,12 @@
         <el-menu-item index="/signup">Sign up</el-menu-item>
       </template>
       <template v-else>
-        <el-menu-item
-          :index="{ name: 'profile', params: { nickname: memberStore.userInfo.nickname } }"
-        >
-          Profile
-        </el-menu-item>
-        <el-menu-item @click="logout">Logout</el-menu-item>
+        <el-sub-menu index="" class="mr-3">
+          <template #title>{{ memberStore.userInfo.nickname }}</template>
+          <el-menu-item :index="`/profile/${memberStore.userInfo.nickname}`"> 프로필 </el-menu-item>
+          <el-menu-item index="/item/save">상품 등록</el-menu-item>
+          <el-menu-item @click="logout">로그아웃</el-menu-item>
+        </el-sub-menu>
       </template>
     </el-menu>
   </el-header>

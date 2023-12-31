@@ -4,7 +4,7 @@
   <el-divider />
   <div class="item-info-container">
     <div class="item-info-left">
-      <el-descriptions column="1" size="large">
+      <el-descriptions :column="1" size="large">
         <el-descriptions-item label="판매자">{{ itemInfo.seller }}</el-descriptions-item>
         <el-descriptions-item label="가격">{{ itemInfo.price }}</el-descriptions-item>
         <el-descriptions-item label="재고">{{ itemInfo.stock }}</el-descriptions-item>
