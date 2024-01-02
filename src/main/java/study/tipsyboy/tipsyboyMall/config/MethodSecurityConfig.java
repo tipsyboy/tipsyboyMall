@@ -10,8 +10,8 @@ import study.tipsyboy.tipsyboyMall.config.permission.GlobalPermissionEvaluator;
 import study.tipsyboy.tipsyboyMall.config.permission.ItemPermissionHandler;
 import study.tipsyboy.tipsyboyMall.config.permission.OrderPermissionHandler;
 import study.tipsyboy.tipsyboyMall.config.permission.PermissionHandler;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
-import study.tipsyboy.tipsyboyMall.order.domain.OrderRepository;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
+import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 
 import java.util.List;
 

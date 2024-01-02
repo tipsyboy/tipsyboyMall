@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
 import study.tipsyboy.tipsyboyMall.order.service.OrderService;
+
+import java.util.List;
 
 @Slf4j
 @RequestMapping("/orders")
@@ -31,6 +34,15 @@ public class OrderApiController {
     @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_MEMBER') && hasPermission(#orderId, 'ORDER', 'READ'))")
     public ResponseEntity<OrderInfoResponseDto> getOrderInfo(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.findOrderById(orderId));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_MEMBER')")
+    public ResponseEntity<List<OrderInfoResponseDto>> getOrderListByMemberId(
+            @ModelAttribute OrderPagingRequestDto requestDto,
+            @AuthenticationPrincipal LoginMember loginMember) {
+
+        return ResponseEntity.ok(orderService.findOrderListByMemberId(requestDto, loginMember.getMemberId()));
     }
 
     @DeleteMapping("/{orderId}")

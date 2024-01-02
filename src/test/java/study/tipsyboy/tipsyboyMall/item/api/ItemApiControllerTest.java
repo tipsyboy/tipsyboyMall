@@ -1,6 +1,7 @@
 package study.tipsyboy.tipsyboyMall.item.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 
@@ -106,8 +107,8 @@ class ItemApiControllerTest {
     }
 
     @Test
-    @DisplayName("모든 상품을 조회한다.")
-    public void getAllItems() throws Exception {
+    @DisplayName("페이징된 상품들을 조회한다.")
+    public void getItemsForPage() throws Exception {
         // given
         Member member = Member.builder()
                 .email("tipsyboy@gmail.com")
@@ -117,21 +118,57 @@ class ItemApiControllerTest {
                 .build();
         memberRepository.save(member);
 
-        List<Item> items = IntStream.range(0, 20)
+        List<Item> items = IntStream.range(0, 50)
                 .mapToObj(i -> Item.builder()
                         .member(member)
                         .itemName("상품 " + i)
                         .price(i)
                         .stock(i)
-                        .description("상품 설명" + i)
+                        .description("상품 설명 " + i)
                         .build())
                 .collect(Collectors.toList());
         itemRepository.saveAll(items);
 
         // expected
-        mockMvc.perform(get("/items")
+        mockMvc.perform(get("/items?page=2&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(20)))
+                .andExpect(jsonPath("$[0].itemName").value("상품 29"))
+                .andExpect(jsonPath("$[19].itemName").value("상품 10"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("페이지가 0과 같거나 작은 경우, 첫 페이지를 가져온다.")
+    public void getItemsForMinusPage() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
+        List<Item> items = IntStream.range(0, 50)
+                .mapToObj(i -> Item.builder()
+                        .member(member)
+                        .itemName("상품 " + i)
+                        .price(i)
+                        .stock(i)
+                        .description("상품 설명 " + i)
+                        .build())
+                .collect(Collectors.toList());
+        itemRepository.saveAll(items);
+
+        // expected
+        mockMvc.perform(get("/items?page=-1&size=20")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Matchers.is(20)))
+                .andExpect(jsonPath("$[0].itemName").value("상품 49"))
+                .andExpect(jsonPath("$[19].itemName").value("상품 30"))
                 .andDo(print());
     }
 

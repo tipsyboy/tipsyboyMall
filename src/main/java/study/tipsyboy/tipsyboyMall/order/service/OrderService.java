@@ -10,12 +10,13 @@ import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
-import study.tipsyboy.tipsyboyMall.order.domain.OrderRepository;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
@@ -67,6 +68,16 @@ public class OrderService {
                 .orElseThrow(() -> new OrderException(OrderExceptionType.ORDER_NOT_FOUND));
 
         order.cancel();
+    }
+
+    public List<OrderInfoResponseDto> findOrderListByMemberId(
+            OrderPagingRequestDto pagingRequestDto, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
+        return orderRepository.getOrderListByMemberId(pagingRequestDto, member).stream()
+                .map(OrderInfoResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     private OrderItem createOrderItem(Map.Entry<Long, Integer> info) {
