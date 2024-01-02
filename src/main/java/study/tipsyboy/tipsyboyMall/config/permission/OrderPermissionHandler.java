@@ -4,12 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
-import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
-import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
-import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
-import study.tipsyboy.tipsyboyMall.order.domain.OrderRepository;
+import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderException;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderExceptionType;
 

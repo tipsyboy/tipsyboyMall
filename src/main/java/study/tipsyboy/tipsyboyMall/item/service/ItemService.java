@@ -10,7 +10,8 @@ import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemEditor;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
+import study.tipsyboy.tipsyboyMall.item.dto.ItemPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
@@ -50,8 +51,15 @@ public class ItemService {
         return new ItemResponseDto(item);
     }
 
+    // TODO: 삭제?
     public List<ItemResponseDto> getAllItems() {
         return itemRepository.findAll().stream()
+                .map(ItemResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItemResponseDto> getItemsForPage(ItemPagingRequestDto pagingRequestDto) {
+        return itemRepository.getItems(pagingRequestDto).stream()
                 .map(ItemResponseDto::new)
                 .collect(Collectors.toList());
     }

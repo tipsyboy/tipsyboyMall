@@ -15,10 +15,10 @@ import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
-import study.tipsyboy.tipsyboyMall.order.domain.OrderRepository;
+import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
 import study.tipsyboy.tipsyboyMall.order.service.OrderService;
@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -223,6 +222,45 @@ class OrderApiControllerTest {
 
         // expected
         mockMvc.perform(delete("/orders/{orderId}", order.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
+    @DisplayName("사용자 id를 통해 주문 목록을 페이징해서 가져온다.")
+    public void getOrderListForPageByMemberId() throws Exception {
+        // given
+        Member member = memberRepository.findAll().get(0);
+        Item item = Item.builder()
+                .member(member)
+                .itemName("벤츠 S 클래스")
+                .price(2000)
+                .stock(100)
+                .description("그림의 떡")
+                .build();
+        itemRepository.save(item);
+
+        List<OrderItem> orderItems = IntStream.range(0, 50)
+                .mapToObj(i -> OrderItem.builder()
+                        .item(item)
+                        .orderPrice(item.getPrice())
+                        .count(1)
+                        .build())
+                .toList();
+        List<Order> savedOrders = IntStream.range(0, 50)
+                .mapToObj(i -> Order.builder()
+                        .member(member)
+                        .orderItems(List.of(orderItems.get(i)))
+                        .orderStatus(OrderStatus.ORDER)
+                        .build())
+                .collect(Collectors.toList());
+        orderRepository.saveAll(savedOrders);
+
+        // expected
+        mockMvc.perform(get("/orders?page=1&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());

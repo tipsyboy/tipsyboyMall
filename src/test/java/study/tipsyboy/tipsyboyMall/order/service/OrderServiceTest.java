@@ -5,18 +5,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.domain.ItemRepository;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
-import study.tipsyboy.tipsyboyMall.order.domain.OrderRepository;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
@@ -225,7 +224,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("상품 id로 주문 내역을 가져온다.")
+    @DisplayName("주문 id로 주문 내역을 가져온다.")
     public void findOrderById() throws Exception {
         // given
         Member member = Member.builder()
@@ -279,5 +278,53 @@ class OrderServiceTest {
             assertEquals(orderItemDto.getOrderPrice(), orderItem.getOrderPrice());
             assertEquals(orderItemDto.getCount(), orderItem.getCount());
         }
+    }
+
+    @Test
+    @DisplayName("해당 id 값의 사용자의 주문 내역을 페이징해서 가져온다.")
+    public void getOrderListForPageByMemberId() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .nickname("간술맨")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
+        Item item = Item.builder()
+                .member(member)
+                .itemName("벤츠 S 클래스")
+                .price(2000)
+                .stock(100)
+                .description("그림의 떡")
+                .build();
+        itemRepository.save(item);
+
+        List<OrderItem> orderItems = IntStream.range(0, 50)
+                .mapToObj(i -> OrderItem.builder()
+                        .item(item)
+                        .orderPrice(item.getPrice())
+                        .count(1)
+                        .build())
+                .toList();
+        List<Order> savedOrders = IntStream.range(0, 50)
+                .mapToObj(i -> Order.builder()
+                        .member(member)
+                        .orderItems(List.of(orderItems.get(i)))
+                        .orderStatus(OrderStatus.ORDER)
+                        .build())
+                .collect(Collectors.toList());
+        orderRepository.saveAll(savedOrders);
+
+        // when
+        OrderPagingRequestDto pagingRequestDto = OrderPagingRequestDto.builder()
+                .page(2)
+                .size(20)
+                .build();
+        List<OrderInfoResponseDto> orderList = orderService.findOrderListByMemberId(pagingRequestDto, member.getId());
+
+        // then
+        assertEquals(20, orderList.size());
     }
 }
