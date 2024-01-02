@@ -64,6 +64,15 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
+    public List<ItemResponseDto> getMyItemForPage(Long memberId, ItemPagingRequestDto pagingRequestDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
+        return itemRepository.getMyItems(pagingRequestDto, member).stream()
+                .map(ItemResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void edit(Long itemId, ItemUpdateDto itemUpdateDto) {
         Item item = itemRepository.findById(itemId)

@@ -40,6 +40,14 @@ public class ItemApiController {
         return ResponseEntity.ok(itemService.getItemsForPage(pagingRequestDto));
     }
 
+    @GetMapping("/items/my-items")
+    public ResponseEntity<List<ItemResponseDto>> getMyItems(
+            @ModelAttribute ItemPagingRequestDto pagingRequestDto,
+            @AuthenticationPrincipal LoginMember loginMember) {
+
+        return ResponseEntity.ok(itemService.getMyItemForPage(loginMember.getMemberId(), pagingRequestDto));
+    }
+
     @PatchMapping("/items/{itemId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_MEMBER') && hasPermission(#itemId, 'ITEM', 'PATCH'))")
     public ResponseEntity<Void> editItem(@PathVariable Long itemId,

@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -133,7 +135,7 @@ class ItemApiControllerTest {
         mockMvc.perform(get("/items?page=2&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Matchers.is(20)))
+                .andExpect(jsonPath("$.length()", is(20)))
                 .andExpect(jsonPath("$[0].itemName").value("상품 29"))
                 .andExpect(jsonPath("$[19].itemName").value("상품 10"))
                 .andDo(print());
@@ -166,7 +168,7 @@ class ItemApiControllerTest {
         mockMvc.perform(get("/items?page=-1&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Matchers.is(20)))
+                .andExpect(jsonPath("$.length()", is(20)))
                 .andExpect(jsonPath("$[0].itemName").value("상품 49"))
                 .andExpect(jsonPath("$[19].itemName").value("상품 30"))
                 .andDo(print());
@@ -252,6 +254,53 @@ class ItemApiControllerTest {
         mockMvc.perform(delete("/items/{itemId}", item.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
+    @DisplayName("내 상품을 조회한다.")
+    public void getMyItems() throws Exception {
+        // given
+        Member member = memberRepository.findAll().get(0);
+        Member member2 = Member.builder()
+                .email("tipsyboy2@gmail.com")
+                .nickname("혼술맨")
+                .password("1234")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member2);
+
+        List<Item> items = IntStream.range(0, 30)
+                .mapToObj(i -> Item.builder()
+                        .member(member)
+                        .itemName("상품 " + i)
+                        .price(10000 + i)
+                        .stock(i)
+                        .description("상품 설명 " + i)
+                        .build())
+                .collect(Collectors.toList());
+        List<Item> items2 = IntStream.range(30, 50)
+                .mapToObj(i -> Item.builder()
+                        .member(member2)
+                        .itemName("상품 " + i)
+                        .price(10000 + i)
+                        .stock(i)
+                        .description("상품 설명 " + i)
+                        .build())
+                .collect(Collectors.toList());
+        itemRepository.saveAll(items);
+        itemRepository.saveAll(items2);
+
+        // expected
+        mockMvc.perform(get("/items/my-items?page=0&size=20")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(20)))
+                .andExpect(jsonPath("$[0].itemName").value("상품 29"))
+                .andExpect(jsonPath("$[19].itemName").value("상품 10"))
+                .andExpect(jsonPath("$[*].seller", everyItem(equalTo("간술맨"))))
                 .andDo(print());
     }
 }
