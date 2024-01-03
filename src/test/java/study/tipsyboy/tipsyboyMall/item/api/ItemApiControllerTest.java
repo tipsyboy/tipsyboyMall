@@ -1,7 +1,6 @@
 package study.tipsyboy.tipsyboyMall.item.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,16 +9,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -301,6 +299,65 @@ class ItemApiControllerTest {
                 .andExpect(jsonPath("$[0].itemName").value("상품 29"))
                 .andExpect(jsonPath("$[19].itemName").value("상품 10"))
                 .andExpect(jsonPath("$[*].seller", everyItem(equalTo("간술맨"))))
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
+    @DisplayName("상품 이름으로 검색한다.")
+    public void searchByItemName() throws Exception {
+        // given
+        Member member = memberRepository.findAll().get(0);
+
+        Item item1 = Item.builder().itemName("벤츠 E 클래스").member(member).price(10000).stock(10).description(".").build();
+        Item item3 = Item.builder().itemName("포르쉐 파나메라").member(member).price(10000).stock(10).description(".").build();
+        Item item5 = Item.builder().itemName("포르쉐 카이엔").member(member).price(10000).stock(10).description(".").build();
+        Item item2 = Item.builder().itemName("벤츠 S 클래스").member(member).price(10000).stock(10).description(".").build();
+        Item item4 = Item.builder().itemName("포르쉐 박스터").member(member).price(10000).stock(10).description(".").build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+        itemRepository.save(item3);
+        itemRepository.save(item4);
+        itemRepository.save(item5);
+
+        mockMvc.perform(get("/items?page=1&size=20&title=벤츠")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
+    @CustomWithMockUser(memberRole = MemberRole.MEMBER)
+    @DisplayName("판매자 이름으로 검색한다")
+    public void searchBySeller() throws Exception {
+        // given
+        Member member = memberRepository.findAll().get(0);
+        Member member2 = Member.builder()
+                .email("tipsyboy2@gmail.com")
+                .nickname("혼술맨")
+                .password("1234")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member2);
+
+        Item item1 = Item.builder().itemName("벤츠 E 클래스").member(member).price(10000).stock(10).description(".").build();
+        Item item3 = Item.builder().itemName("포르쉐 파나메라").member(member).price(10000).stock(10).description(".").build();
+        Item item5 = Item.builder().itemName("포르쉐 카이엔").member(member2).price(10000).stock(10).description(".").build();
+        Item item2 = Item.builder().itemName("벤츠 S 클래스").member(member2).price(10000).stock(10).description(".").build();
+        Item item4 = Item.builder().itemName("포르쉐 박스터").member(member2).price(10000).stock(10).description(".").build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+        itemRepository.save(item3);
+        itemRepository.save(item4);
+        itemRepository.save(item5);
+
+        mockMvc.perform(get("/items?page=1&size=20&seller=혼술맨")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(3)))
                 .andDo(print());
     }
 }

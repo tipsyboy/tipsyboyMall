@@ -1,6 +1,5 @@
 package study.tipsyboy.tipsyboyMall.auth.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 
