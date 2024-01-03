@@ -8,7 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
-import study.tipsyboy.tipsyboyMall.item.dto.ItemPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.service.ItemService;
@@ -36,13 +36,13 @@ public class ItemApiController {
     }
 
     @GetMapping("/items")
-    public ResponseEntity<List<ItemResponseDto>> getItems(@ModelAttribute ItemPagingRequestDto pagingRequestDto) {
+    public ResponseEntity<List<ItemResponseDto>> getItems(@ModelAttribute ItemSearchReqDto pagingRequestDto) {
         return ResponseEntity.ok(itemService.getItemsForPage(pagingRequestDto));
     }
 
     @GetMapping("/items/my-items")
     public ResponseEntity<List<ItemResponseDto>> getMyItems(
-            @ModelAttribute ItemPagingRequestDto pagingRequestDto,
+            @ModelAttribute ItemSearchReqDto pagingRequestDto,
             @AuthenticationPrincipal LoginMember loginMember) {
 
         return ResponseEntity.ok(itemService.getMyItemForPage(loginMember.getMemberId(), pagingRequestDto));

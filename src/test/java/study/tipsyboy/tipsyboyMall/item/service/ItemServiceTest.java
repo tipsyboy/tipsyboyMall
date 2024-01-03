@@ -9,7 +9,7 @@ import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.dto.ItemPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
@@ -17,6 +17,7 @@ import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -34,7 +35,6 @@ class ItemServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
 
     @AfterEach
     public void after() {
@@ -256,7 +256,7 @@ class ItemServiceTest {
         itemRepository.saveAll(items);
 
         // when
-        ItemPagingRequestDto paging = ItemPagingRequestDto.builder()
+        ItemSearchReqDto paging = ItemSearchReqDto.builder()
                 .page(2)
                 .build();
         List<ItemResponseDto> findItems = itemService.getItemsForPage(paging);
@@ -311,7 +311,7 @@ class ItemServiceTest {
         itemRepository.saveAll(items2);
 
         // when - 첫 번째 MEMBER 간술맨의 상품만 2번째 페이지 내림차순 조회한다.
-        ItemPagingRequestDto paging = ItemPagingRequestDto.builder()
+        ItemSearchReqDto paging = ItemSearchReqDto.builder()
                 .page(2)
                 .build();
         List<ItemResponseDto> findItems = itemService.getMyItemForPage(member.getId(), paging);
@@ -321,5 +321,90 @@ class ItemServiceTest {
         assertEquals(10, findItems.size());
         assertEquals("상품 9", findItems.get(0).getItemName());
         assertEquals("상품 0", findItems.get(findItems.size() - 1).getItemName());
+    }
+
+    @Test
+    @DisplayName("상품 제목으로 검색")
+    public void searchByItemName() throws Exception {
+        // given
+        Member member = Member.builder()
+                .email("tipsyboy@gmail.com")
+                .nickname("간술맨")
+                .password("1234")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+
+        Item item1 = Item.builder().itemName("벤츠 E 클래스").member(member).price(10000).stock(10).description(".").build();
+        Item item2 = Item.builder().itemName("벤츠 S 클래스").member(member).price(10000).stock(10).description(".").build();
+        Item item3 = Item.builder().itemName("포르쉐 파나메라").member(member).price(10000).stock(10).description(".").build();
+        Item item4 = Item.builder().itemName("포르쉐 박스터").member(member).price(10000).stock(10).description(".").build();
+        Item item5 = Item.builder().itemName("포르쉐 카이엔").member(member).price(10000).stock(10).description(".").build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+        itemRepository.save(item3);
+        itemRepository.save(item4);
+        itemRepository.save(item5);
+
+
+        // when - 제목에 '벤츠'가 포함된 상품 검색
+        ItemSearchReqDto searchReqDto = ItemSearchReqDto.builder()
+                .page(1)
+                .title("벤츠")
+                .build();
+        List<ItemResponseDto> searchedItems = itemService.getItemsForPage(searchReqDto);
+
+        // then
+        assertEquals(5, itemRepository.count());
+        assertEquals(2, searchedItems.size());
+        for (ItemResponseDto searchedItem : searchedItems) {
+            assertTrue(searchedItem.getItemName().contains("벤츠"));
+        }
+    }
+
+    @Test
+    @DisplayName("판매자 이름으로 검색")
+    public void searchBySeller() throws Exception {
+        // given
+        Member member = Member.builder()
+                .nickname("간술맨")
+                .email("tipsyboy@gmail.com")
+                .password("1234")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        Member member2 = Member.builder()
+                .nickname("혼술맨")
+                .email("tipsyboy2@gmail.com")
+                .password("1234")
+                .memberRole(MemberRole.MEMBER)
+                .build();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+
+        Item item1 = Item.builder().itemName("벤츠 E 클래스").member(member).price(10000).stock(10).description(".").build();
+        Item item3 = Item.builder().itemName("포르쉐 파나메라").member(member).price(10000).stock(10).description(".").build();
+        Item item5 = Item.builder().itemName("포르쉐 카이엔").member(member).price(10000).stock(10).description(".").build();
+        Item item2 = Item.builder().itemName("벤츠 S 클래스").member(member2).price(10000).stock(10).description(".").build();
+        Item item4 = Item.builder().itemName("포르쉐 박스터").member(member2).price(10000).stock(10).description(".").build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+        itemRepository.save(item3);
+        itemRepository.save(item4);
+        itemRepository.save(item5);
+
+
+        // when - 판매자 이름에 '혼술맨'이 포함된 상품 검색
+        ItemSearchReqDto searchReqDto = ItemSearchReqDto.builder()
+                .page(1)
+                .seller("혼술맨")
+                .build();
+        List<ItemResponseDto> searchedItems = itemService.getItemsForPage(searchReqDto);
+
+        // then
+        assertEquals(5, itemRepository.count());
+        assertEquals(2, searchedItems.size());
+        for (ItemResponseDto searchedItem : searchedItems) {
+            assertTrue(searchedItem.getSeller().contains("혼술맨"));
+        }
     }
 }

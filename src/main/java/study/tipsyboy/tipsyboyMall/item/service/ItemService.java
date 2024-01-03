@@ -10,7 +10,7 @@ import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemEditor;
-import study.tipsyboy.tipsyboyMall.item.dto.ItemPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
@@ -58,13 +58,13 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
-    public List<ItemResponseDto> getItemsForPage(ItemPagingRequestDto pagingRequestDto) {
+    public List<ItemResponseDto> getItemsForPage(ItemSearchReqDto pagingRequestDto) {
         return itemRepository.getItems(pagingRequestDto).stream()
                 .map(ItemResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    public List<ItemResponseDto> getMyItemForPage(Long memberId, ItemPagingRequestDto pagingRequestDto) {
+    public List<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto pagingRequestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
