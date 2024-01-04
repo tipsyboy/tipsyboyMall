@@ -1,5 +1,5 @@
 <template>
-  <h2>상품 등록</h2>
+  <h2>상품 수정</h2>
   <el-form :model="form" class="itemSaveForm" label-width="90px" status-icon>
     <el-form-item
       label="상품명"
@@ -43,23 +43,44 @@
       />
     </el-form-item>
     <el-form-item size="large">
-      <el-button type="primary" @click="saveItem()">등록</el-button>
+      <el-button @click="handleEditItem" type="primary">수정</el-button>
+      <el-button @click="handleCancel">취소</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
-const itemId = ref(-1)
+const route = useRoute()
 const router = useRouter()
 const form = ref({
+  itemId: 0,
   itemName: '',
   price: 0,
   stock: 0,
   description: ''
+})
+
+onMounted(() => {
+  axios
+    .get(`http://localhost:8080/items/${route.params.itemId}`, {
+      withCredentials: true
+    })
+    .then((response) => {
+      console.log(response.data)
+      const itemInfo = response.data
+      form.value.itemId = itemInfo.itemId
+      form.value.itemName = itemInfo.itemName
+      form.value.price = itemInfo.price
+      form.value.stock = itemInfo.stock
+      form.value.description = itemInfo.description
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 })
 
 const validatePrice = (rule: any, value: any, callback: any) => {
@@ -71,10 +92,10 @@ const validatePrice = (rule: any, value: any, callback: any) => {
   }
 }
 
-const saveItem = async () => {
-  await axios
-    .post(
-      'http://localhost:8080/items',
+const handleEditItem = () => {
+  axios
+    .patch(
+      `http://localhost:8080/items/${route.params.itemId}`,
       {
         itemName: form.value.itemName,
         price: form.value.price,
@@ -88,14 +109,16 @@ const saveItem = async () => {
         }
       }
     )
-    .then((response) => {
-      console.log(response)
-      itemId.value = response.data
-      router.replace({ name: 'itemDetail', params: { itemId: itemId.value } })
+    .then(() => {
+      router.push({ name: 'itemDetail', params: { itemId: form.value.itemId } })
     })
     .catch((error) => {
-      console.log(error)
+      console.error(error)
     })
+}
+
+const handleCancel = () => {
+  router.go(-1)
 }
 </script>
 

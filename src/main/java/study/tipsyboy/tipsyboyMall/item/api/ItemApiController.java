@@ -25,10 +25,9 @@ public class ItemApiController {
 
     @PostMapping("/items")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
-    public ResponseEntity<Void> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto,
+    public ResponseEntity<Long> saveItem(@RequestBody @Valid ItemCreateDto itemCreateDto,
                                          @AuthenticationPrincipal LoginMember loginMember) {
-        itemService.saveItem(itemCreateDto, loginMember.getMemberId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(itemService.saveItem(itemCreateDto, loginMember.getMemberId()));
     }
 
     @GetMapping("/items/{itemId}")

@@ -18,6 +18,7 @@
     <el-table-column prop="xxx" label="조회수" />
   </el-table>
   <el-pagination
+    :hide-on-single-page="true"
     class="paging-bar"
     background
     layout="prev, pager, next"
