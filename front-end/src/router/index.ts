@@ -12,6 +12,7 @@ import MyOrder from '@/views/personal/MyOrder.vue'
 import ItemCreate from '@/views/item/ItemCreate.vue'
 import ItemList from '@/views/item/ItemList.vue'
 import ItemDetail from '@/views/item/ItemDetail.vue'
+import ItemEdit from '@/views/item/ItemEdit.vue'
 
 
 
@@ -65,6 +66,11 @@ const router = createRouter({
       path: '/item/:itemId',
       name: 'itemDetail',
       component: ItemDetail
+    },
+    {
+      path: '/item/edit/:itemId',
+      name: 'itemEdit',
+      component: ItemEdit
     },
     // order
     {

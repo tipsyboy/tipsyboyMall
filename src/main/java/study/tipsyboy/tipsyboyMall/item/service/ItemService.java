@@ -35,7 +35,7 @@ public class ItemService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void saveItem(ItemCreateDto itemCreateDto, Long memberId) {
+    public Long saveItem(ItemCreateDto itemCreateDto, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
@@ -46,7 +46,8 @@ public class ItemService {
                 .stock(itemCreateDto.getStock())
                 .description(itemCreateDto.getDescription())
                 .build();
-        itemRepository.save(item);
+
+        return itemRepository.save(item).getId();
     }
 
     public ItemResponseDto getItemById(Long itemId) {
