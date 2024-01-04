@@ -17,7 +17,16 @@
     </el-table-column>
     <el-table-column prop="xxx" label="조회수" />
   </el-table>
+  <el-pagination
+    class="paging-bar"
+    background
+    layout="prev, pager, next"
+    @current-change="handlePageChange"
+    :default-page-size="pageSize"
+    :total="totalCount"
+  />
 </template>
+
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
@@ -25,19 +34,38 @@ import moment from 'moment'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const requestUrl = 'http://localhost:8080/items'
 const items = ref([])
+const currentPage = ref(1)
+const pageSize = ref(12)
+const totalCount = ref(0)
 
 onMounted(async () => {
+  fetchData()
+})
+
+const fetchData = async () => {
+  const queryParams = {
+    page: currentPage.value,
+    size: pageSize.value
+  }
+
   await axios
-    .get('http://localhost:8080/items')
+    .get(requestUrl, { params: queryParams })
     .then((response) => {
       console.log(response)
-      items.value = response.data
+      items.value = response.data.content
+      totalCount.value = response.data.totalElements
     })
     .catch((error) => {
       console.log(error)
     })
-})
+}
+
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  fetchData()
+}
 
 const formatDateTime = (dateTime: any) => {
   return moment(dateTime).format('YYYY-MM-DD HH:mm')
@@ -55,5 +83,10 @@ const rowClassName = (row: any, index: number) => {
 <style>
 .hovered-row {
   cursor: pointer;
+}
+
+.paging-bar {
+  margin-top: 10px;
+  margin-left: 20%;
 }
 </style>

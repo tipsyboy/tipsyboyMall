@@ -2,6 +2,10 @@ package study.tipsyboy.tipsyboyMall.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
@@ -58,10 +62,14 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
-    public List<ItemResponseDto> getItemsForPage(ItemSearchReqDto pagingRequestDto) {
-        return itemRepository.getItems(pagingRequestDto).stream()
+    public Page<ItemResponseDto> getItemsForPage(ItemSearchReqDto requestDto) {
+        Page<Item> resultPage = itemRepository.getItems(requestDto, createPageable(requestDto));
+
+        List<ItemResponseDto> items = resultPage.getContent().stream()
                 .map(ItemResponseDto::new)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(items, resultPage.getPageable(), resultPage.getTotalElements());
     }
 
     public List<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto pagingRequestDto) {
@@ -96,4 +104,7 @@ public class ItemService {
         itemRepository.delete(item);
     }
 
+    private Pageable createPageable(ItemSearchReqDto pagingRequestDto) {
+        return PageRequest.of(pagingRequestDto.getPage() - 1, pagingRequestDto.getSize());
+    }
 }

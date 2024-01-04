@@ -23,4 +23,8 @@ public class ItemSearchReqDto {
     public Long getOffset() {
         return (long) (Math.max(1, this.page) - 1) * Math.min(this.size, MAX_SIZE);
     }
+
+    public Integer getPage() {
+        return Math.max(1, this.page);
+    }
 }

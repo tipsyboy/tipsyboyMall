@@ -2,6 +2,7 @@ package study.tipsyboy.tipsyboyMall.item.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,7 +37,7 @@ public class ItemApiController {
     }
 
     @GetMapping("/items")
-    public ResponseEntity<List<ItemResponseDto>> getItems(@ModelAttribute ItemSearchReqDto pagingRequestDto) {
+    public ResponseEntity<Page<ItemResponseDto>> getItems(@ModelAttribute ItemSearchReqDto pagingRequestDto) {
         return ResponseEntity.ok(itemService.getItemsForPage(pagingRequestDto));
     }
 
