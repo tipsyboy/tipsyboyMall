@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
@@ -259,13 +260,14 @@ class ItemServiceTest {
         ItemSearchReqDto paging = ItemSearchReqDto.builder()
                 .page(2)
                 .build();
-        List<ItemResponseDto> findItems = itemService.getItemsForPage(paging);
+
+        Page<ItemResponseDto> findItems = itemService.getItemsForPage(paging);
 
         // then
         assertEquals(50, itemRepository.count());
-        assertEquals(20, findItems.size());
-        assertEquals("상품 29", findItems.get(0).getItemName());
-        assertEquals("상품 10", findItems.get(findItems.size() - 1).getItemName());
+        assertEquals(20, findItems.getContent().size());
+        assertEquals("상품 29", findItems.getContent().get(0).getItemName());
+        assertEquals("상품 10", findItems.getContent().get(findItems.getContent().size() - 1).getItemName());
     }
 
     @Test
@@ -352,12 +354,12 @@ class ItemServiceTest {
                 .page(1)
                 .title("벤츠")
                 .build();
-        List<ItemResponseDto> searchedItems = itemService.getItemsForPage(searchReqDto);
+        Page<ItemResponseDto> searchItems = itemService.getItemsForPage(searchReqDto);
 
         // then
         assertEquals(5, itemRepository.count());
-        assertEquals(2, searchedItems.size());
-        for (ItemResponseDto searchedItem : searchedItems) {
+        assertEquals(2, searchItems.getContent().size());
+        for (ItemResponseDto searchedItem : searchItems) {
             assertTrue(searchedItem.getItemName().contains("벤츠"));
         }
     }
@@ -398,12 +400,12 @@ class ItemServiceTest {
                 .page(1)
                 .seller("혼술맨")
                 .build();
-        List<ItemResponseDto> searchedItems = itemService.getItemsForPage(searchReqDto);
+        Page<ItemResponseDto> searchItems = itemService.getItemsForPage(searchReqDto);
 
         // then
         assertEquals(5, itemRepository.count());
-        assertEquals(2, searchedItems.size());
-        for (ItemResponseDto searchedItem : searchedItems) {
+        assertEquals(2, searchItems.getContent().size());
+        for (ItemResponseDto searchedItem : searchItems) {
             assertTrue(searchedItem.getSeller().contains("혼술맨"));
         }
     }

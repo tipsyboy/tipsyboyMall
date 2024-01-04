@@ -133,9 +133,9 @@ class ItemApiControllerTest {
         mockMvc.perform(get("/items?page=2&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(20)))
-                .andExpect(jsonPath("$[0].itemName").value("상품 29"))
-                .andExpect(jsonPath("$[19].itemName").value("상품 10"))
+                .andExpect(jsonPath("$.content.length()", is(20)))
+                .andExpect(jsonPath("$.content[0].itemName").value("상품 29"))
+                .andExpect(jsonPath("$.content[19].itemName").value("상품 10"))
                 .andDo(print());
     }
 
@@ -166,9 +166,9 @@ class ItemApiControllerTest {
         mockMvc.perform(get("/items?page=-1&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(20)))
-                .andExpect(jsonPath("$[0].itemName").value("상품 49"))
-                .andExpect(jsonPath("$[19].itemName").value("상품 30"))
+                .andExpect(jsonPath("$.content.length()", is(20)))
+                .andExpect(jsonPath("$.content[0].itemName").value("상품 49"))
+                .andExpect(jsonPath("$.content[19].itemName").value("상품 30"))
                 .andDo(print());
     }
 
@@ -324,7 +324,7 @@ class ItemApiControllerTest {
         mockMvc.perform(get("/items?page=1&size=20&title=벤츠")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$.content.length()", is(2)))
                 .andDo(print());
     }
 
@@ -357,7 +357,7 @@ class ItemApiControllerTest {
         mockMvc.perform(get("/items?page=1&size=20&seller=혼술맨")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(3)))
+                .andExpect(jsonPath("$.content.length()", is(3)))
                 .andDo(print());
     }
 }
