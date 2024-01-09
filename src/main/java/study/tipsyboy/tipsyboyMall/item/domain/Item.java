@@ -1,16 +1,22 @@
 package study.tipsyboy.tipsyboyMall.item.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
+import study.tipsyboy.tipsyboyMall.files.ItemFile;
+import study.tipsyboy.tipsyboyMall.files.UploadFile;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Item extends BaseTimeEntity {
 
@@ -23,11 +29,16 @@ public class Item extends BaseTimeEntity {
     private int price;
     private int stock; // 재고
     private String description; // 상품
+
+    @Enumerated(value = EnumType.STRING)
     private ItemStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 판매자
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemFile> itemImages = new ArrayList<>();
 
     @Builder
     public Item(String itemName, int price, int stock, String description, Member member) {

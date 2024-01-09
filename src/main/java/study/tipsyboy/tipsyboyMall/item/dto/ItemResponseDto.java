@@ -2,9 +2,14 @@ package study.tipsyboy.tipsyboyMall.item.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import study.tipsyboy.tipsyboyMall.files.ItemFile;
+import study.tipsyboy.tipsyboyMall.files.UploadFile;
+import study.tipsyboy.tipsyboyMall.files.dto.ItemFileResponseDto;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class ItemResponseDto {
@@ -14,10 +19,12 @@ public class ItemResponseDto {
     private final String itemName;
     private final String status;
     private final String seller;
-    private final Integer price; // TODO: 삭제?
-    private final Integer stock; // TODO: 삭제?
+    private final Integer price;
+    private final Integer stock;
     private final String description; // TODO: 삭제?
     private final LocalDateTime createdDate;
+
+    private final List<ItemFileResponseDto> itemImages;
 
     public ItemResponseDto(Item item) {
         this.itemId = item.getId();
@@ -28,19 +35,9 @@ public class ItemResponseDto {
         this.stock = item.getStock();
         this.description = item.getDescription();
         this.createdDate = item.getCreateDate();
-    }
 
-//    @Builder
-//    public ItemResponseDto(Long itemId, String itemName,
-//                           String status, Integer price,
-//                           Integer stock, String description,
-//                           LocalDateTime createdDate) {
-//        this.itemId = itemId;
-//        this.itemName = itemName;
-//        this.status = status;
-//        this.price = price;
-//        this.stock = stock;
-//        this.description = description;
-//        this.createdDate = createdDate;
-//    }
+        this.itemImages = item.getItemImages().stream()
+                .map(ItemFileResponseDto::new)
+                .collect(Collectors.toList());
+    }
 }

@@ -21,6 +21,7 @@ const useMemberStore = defineStore('memberStore', () => {
           },
         })
         .then((response) => {
+            console.log(response)
             userInfo.value =
             { 
                 email: response.data.email, 
