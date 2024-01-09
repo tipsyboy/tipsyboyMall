@@ -6,9 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
+import study.tipsyboy.tipsyboyMall.files.UploadFile;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
@@ -18,6 +24,9 @@ import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,8 +53,9 @@ class ItemServiceTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("상품을 등록한다.")
-    public void saveItem() {
+    public void saveItem() throws IOException {
         // given
         Member member = Member.builder()
                 .email("tipsyboy@gmail.com")
@@ -55,6 +65,11 @@ class ItemServiceTest {
                 .build();
         memberRepository.save(member);
 
+        List<MultipartFile> imageFiles = List.of(
+                new MockMultipartFile("testImage1", "test1.PNG", MediaType.IMAGE_PNG_VALUE, "test1".getBytes()),
+                new MockMultipartFile("testImage2", "test2.PNG", MediaType.IMAGE_PNG_VALUE, "test2".getBytes())
+        );
+
         ItemCreateDto itemCreateDto = ItemCreateDto.builder()
                 .itemName("상품")
                 .price(2000)
@@ -63,15 +78,24 @@ class ItemServiceTest {
                 .build();
 
         // when
-        itemService.saveItem(itemCreateDto, member.getId());
+        Long itemId = itemService.saveItem(itemCreateDto, member.getId(), imageFiles);
+        Item findItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
         // then
-        Item findItem = itemRepository.findAll().get(0);
         assertEquals(1L, itemRepository.count());
         assertEquals("상품", findItem.getItemName());
         assertEquals(2000, findItem.getPrice());
         assertEquals(10, findItem.getStock());
         assertEquals("상품 설명입니다.", findItem.getDescription());
+
+        // imageFile
+        assertNotNull(findItem.getItemImages());
+        assertEquals(2, findItem.getItemImages().size());
+        List<String> expectedFileNames = List.of("test1.PNG", "test2.PNG");
+        for (UploadFile uploadFile : findItem.getItemImages()) {
+            assertTrue(expectedFileNames.contains(uploadFile.getUploadName()));
+        }
     }
 
     @Test

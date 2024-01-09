@@ -1,5 +1,13 @@
 <template>
-  <el-empty :image-size="150" />
+  <div>
+    <el-empty :image-size="150" v-if="!itemInfo.itemImages || itemInfo.itemImages.length === 0" />
+    <el-carousel indicator-position="outside" :pause-on-hover="true" height="430px">
+      <el-carousel-item v-for="(itemImage, index) in itemInfo.itemImages" :key="index">
+        <img class="item-image" :src="getImageUrl(itemImage.storedName)" />
+      </el-carousel-item>
+    </el-carousel>
+  </div>
+
   <div class="item-header">
     <h1 class="item-name">{{ itemInfo.itemName }}</h1>
     <div class="item-btn" v-if="isOwner()">
@@ -86,6 +94,11 @@ const toEditPage = () => {
   const itemId = itemInfo.value.itemId
   router.push({ name: 'itemEdit', params: { itemId } })
 }
+
+const getImageUrl = (storedName: string) => {
+  // 이미지 파일이 저장된 경로에 따라 수정이 필요할 수 있습니다.
+  return `http://localhost:8080/images/${storedName}`
+}
 </script>
 
 <style scoped>
@@ -106,5 +119,10 @@ const toEditPage = () => {
 
 .item-description {
   margin-top: 20px;
+}
+.el-carousel__item .item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 </style>

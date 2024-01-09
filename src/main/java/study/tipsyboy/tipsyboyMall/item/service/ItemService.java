@@ -8,20 +8,23 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
+import study.tipsyboy.tipsyboyMall.files.FileStore;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.domain.ItemEditor;
-import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
-import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
+import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +36,10 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
+    private final FileStore fileStore;
 
     @Transactional
-    public Long saveItem(ItemCreateDto itemCreateDto, Long memberId) {
+    public Long saveItem(ItemCreateDto itemCreateDto, Long memberId, List<MultipartFile> imageFiles) throws IOException {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
@@ -46,6 +50,10 @@ public class ItemService {
                 .stock(itemCreateDto.getStock())
                 .description(itemCreateDto.getDescription())
                 .build();
+
+        if (imageFiles != null) {
+            saveItemImages(item, imageFiles);
+        }
 
         return itemRepository.save(item).getId();
     }
@@ -107,5 +115,11 @@ public class ItemService {
 
     private Pageable createPageable(ItemSearchReqDto pagingRequestDto) {
         return PageRequest.of(pagingRequestDto.getPage() - 1, pagingRequestDto.getSize());
+    }
+
+    private void saveItemImages(Item item, List<MultipartFile> itemFiles) throws IOException {
+        for (MultipartFile itemFile : itemFiles) {
+            fileStore.createFileForItem(item, itemFile);
+        }
     }
 }
