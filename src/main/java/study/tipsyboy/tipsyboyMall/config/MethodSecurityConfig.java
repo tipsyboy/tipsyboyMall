@@ -6,10 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import study.tipsyboy.tipsyboyMall.config.permission.GlobalPermissionEvaluator;
-import study.tipsyboy.tipsyboyMall.config.permission.ItemPermissionHandler;
-import study.tipsyboy.tipsyboyMall.config.permission.OrderPermissionHandler;
-import study.tipsyboy.tipsyboyMall.config.permission.PermissionHandler;
+import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
+import study.tipsyboy.tipsyboyMall.config.permission.*;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 
@@ -22,6 +20,7 @@ public class MethodSecurityConfig {
 
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+    private final CartItemRepository cartItemRepository;
 
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
@@ -29,7 +28,8 @@ public class MethodSecurityConfig {
         GlobalPermissionEvaluator evaluator = new GlobalPermissionEvaluator(
                 List.of(
                         orderPermissionHandler(),
-                        itemPermissionHandler()
+                        itemPermissionHandler(),
+                        cartItemPermissionHandler()
                 ));
 
         handler.setPermissionEvaluator(evaluator);
@@ -44,5 +44,10 @@ public class MethodSecurityConfig {
     @Bean
     public PermissionHandler itemPermissionHandler() {
         return new ItemPermissionHandler(itemRepository);
+    }
+
+    @Bean
+    public PermissionHandler cartItemPermissionHandler() {
+        return new CartItemPermissionHandler(cartItemRepository);
     }
 }
