@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
@@ -19,6 +20,7 @@ import study.tipsyboy.tipsyboyMall.item.dto.ItemCreateDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -56,7 +58,6 @@ class ItemApiControllerTest {
     @DisplayName("상품을 등록한다.")
     public void saveItem() throws Exception {
         // given
-        Member member = memberRepository.findAll().get(0);
         ItemCreateDto itemCreateDto = ItemCreateDto.builder()
                 .itemName("상품")
                 .price(2000)
@@ -66,12 +67,26 @@ class ItemApiControllerTest {
 
         String json = objectMapper.writeValueAsString(itemCreateDto);
 
+        MockMultipartFile jsonToMultipart = new MockMultipartFile(
+                "itemCreateDto",
+                "itemCreateDto",
+                "application/json",
+                json.getBytes(StandardCharsets.UTF_8));
+
         // expected
-        mockMvc.perform(post("/items")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+        mockMvc.perform(multipart("/items")
+                        .file(jsonToMultipart)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                )
                 .andExpect(status().isOk())
                 .andDo(print());
+
+//        // expected
+//        mockMvc.perform(post("/items")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(json))
+//                .andExpect(status().isOk())
+//                .andDo(print());
     }
 
     @Test
