@@ -18,17 +18,18 @@ public class FileStore {
     private static final String FILE_PATH = "src/main/resources/static/files/";
 
 
-
     public void createFileForItem(Item item, MultipartFile multipartFile) throws IOException {
         String originalFileName = multipartFile.getOriginalFilename();
         String storedFileName = createStoredFileName(originalFileName);
 
         String itemFilePath = getItemFilePath(storedFileName);
         Path absolutePath = Paths.get(itemFilePath).toAbsolutePath();
-//        File directory = new File(directoryPath);
-//        if (!directory.exists()) {
-//            directory.mkdirs();
-//        }
+
+        File dir = absolutePath.getParent().toFile();
+        if (!dir.exists()) {
+//            dir.mkdir();
+            dir.mkdirs();
+        }
 
         multipartFile.transferTo(absolutePath.toFile());
         ItemFile.builder()
