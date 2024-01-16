@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
 import study.tipsyboy.tipsyboyMall.files.ItemFile;
-import study.tipsyboy.tipsyboyMall.files.UploadFile;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
+import study.tipsyboy.tipsyboyMall.likeitem.domain.LikeItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,8 @@ public class Item extends BaseTimeEntity {
     private int stock; // 재고
     private String description; // 상품
 
+    private int likes;
+
     @Enumerated(value = EnumType.STRING)
     private ItemStatus status;
 
@@ -40,6 +42,9 @@ public class Item extends BaseTimeEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemFile> itemImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<LikeItem> likeItemList = new ArrayList<>();
+
     @Builder
     public Item(String itemName, int price, int stock, String description, Member member) {
         setMember(member);
@@ -48,6 +53,7 @@ public class Item extends BaseTimeEntity {
         this.stock = stock;
         this.description = description;
         this.status = ItemStatus.ON_SALE;
+        this.likes = 0;
     }
 
     public ItemEditor.ItemEditorBuilder toEditor() {
@@ -63,6 +69,10 @@ public class Item extends BaseTimeEntity {
         this.price = itemEditor.getPrice();
         this.stock = itemEditor.getStock();
         this.description = itemEditor.getDescription();
+    }
+
+    public Long getMemberId() {
+        return this.member.getId();
     }
 
     public void addStock(int count) {
@@ -81,7 +91,8 @@ public class Item extends BaseTimeEntity {
         member.getItemList().add(this);
     }
 
-    public Long getMemberId() {
-        return this.member.getId();
+    public void addLikeCount() {
+        this.likes += 1;
     }
+
 }
