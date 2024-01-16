@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.config.permission.*;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
+import study.tipsyboy.tipsyboyMall.likeitem.repository.LikeItemRepository;
 import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class MethodSecurityConfig {
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
     private final CartItemRepository cartItemRepository;
+    private final LikeItemRepository likeItemRepository;
 
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
@@ -29,7 +31,8 @@ public class MethodSecurityConfig {
                 List.of(
                         orderPermissionHandler(),
                         itemPermissionHandler(),
-                        cartItemPermissionHandler()
+                        cartItemPermissionHandler(),
+                        likeItemPermissionHandler()
                 ));
 
         handler.setPermissionEvaluator(evaluator);
@@ -49,5 +52,10 @@ public class MethodSecurityConfig {
     @Bean
     public PermissionHandler cartItemPermissionHandler() {
         return new CartItemPermissionHandler(cartItemRepository);
+    }
+
+    @Bean
+    public PermissionHandler likeItemPermissionHandler() {
+        return new LikeItemPermissionHandler(likeItemRepository);
     }
 }
