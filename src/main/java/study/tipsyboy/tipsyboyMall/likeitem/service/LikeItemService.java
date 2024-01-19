@@ -22,7 +22,6 @@ import study.tipsyboy.tipsyboyMall.likeitem.repository.LikeItemRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
+import study.tipsyboy.tipsyboyMall.comment.domain.Comment;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
 import study.tipsyboy.tipsyboyMall.files.ItemFile;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
@@ -19,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Item extends BaseTimeEntity {
-
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
@@ -44,6 +44,9 @@ public class Item extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<LikeItem> likeItemList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Item(String itemName, int price, int stock, String description, Member member) {
