@@ -7,6 +7,7 @@ import org.springframework.security.access.expression.method.DefaultMethodSecuri
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
+import study.tipsyboy.tipsyboyMall.comment.repository.CommentRepository;
 import study.tipsyboy.tipsyboyMall.config.permission.*;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.likeitem.repository.LikeItemRepository;
@@ -23,6 +24,7 @@ public class MethodSecurityConfig {
     private final ItemRepository itemRepository;
     private final CartItemRepository cartItemRepository;
     private final LikeItemRepository likeItemRepository;
+    private final CommentRepository commentRepository;
 
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
@@ -32,7 +34,8 @@ public class MethodSecurityConfig {
                         orderPermissionHandler(),
                         itemPermissionHandler(),
                         cartItemPermissionHandler(),
-                        likeItemPermissionHandler()
+                        likeItemPermissionHandler(),
+                        commentPermissionHandler()
                 ));
 
         handler.setPermissionEvaluator(evaluator);
@@ -57,5 +60,10 @@ public class MethodSecurityConfig {
     @Bean
     public PermissionHandler likeItemPermissionHandler() {
         return new LikeItemPermissionHandler(likeItemRepository);
+    }
+
+    @Bean
+    public PermissionHandler commentPermissionHandler() {
+        return new CommentPermissionHandler(commentRepository);
     }
 }

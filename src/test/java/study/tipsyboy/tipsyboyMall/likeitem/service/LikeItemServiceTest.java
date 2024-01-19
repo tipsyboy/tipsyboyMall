@@ -1,12 +1,12 @@
 package study.tipsyboy.tipsyboyMall.likeitem.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
@@ -39,11 +39,15 @@ class LikeItemServiceTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    @Autowired
+    private EntityManager em;
+
     @AfterEach
     public void after() {
-        likeItemRepository.deleteAll();
         itemRepository.deleteAll();
+        likeItemRepository.deleteAll();
         memberRepository.deleteAll();
+        em.clear();
     }
     
     @Test

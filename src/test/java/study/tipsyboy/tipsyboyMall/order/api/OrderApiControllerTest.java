@@ -57,9 +57,9 @@ class OrderApiControllerTest {
 
     @AfterEach
     public void after() {
-        memberRepository.deleteAll();
         orderRepository.deleteAll();
         itemRepository.deleteAll();
+        memberRepository.deleteAll();
     }
 
     @Test
