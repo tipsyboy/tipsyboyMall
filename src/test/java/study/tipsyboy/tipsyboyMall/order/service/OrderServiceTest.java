@@ -8,28 +8,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
+import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
+import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
-import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
+import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
-import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderByCartCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderItemResponseDto;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderException;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderExceptionType;
+import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class OrderServiceTest {
@@ -46,16 +48,20 @@ class OrderServiceTest {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
     @AfterEach
     public void after() {
         orderRepository.deleteAll();
+        cartItemRepository.deleteAll();
         itemRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("상품 정보를 받아서 주문을 생성, 주문이 생성되고 상품의 재고가 줄어든다.")
-    public void createOrder() throws Exception {
+    @DisplayName("장바구니에 등록된 상품을 주문한다.")
+    public void createOrderByCart() throws Exception {
         // given
         Member member = Member.builder()
                 .email("tipsyboy@gmail.com")
@@ -78,14 +84,31 @@ class OrderServiceTest {
         Item savedItem2 = itemRepository.save(items.get(1));
         Item savedItem3 = itemRepository.save(items.get(2));
 
-        // when
-        HashMap<Long, Integer> orderInfo = new HashMap<>();
-        orderInfo.put(savedItem1.getId(), 1);
-        orderInfo.put(savedItem2.getId(), 2);
-        OrderCreateDto orderCreateDto = OrderCreateDto.builder()
-                .orderInfo(orderInfo)
+        CartItem cartItem1 = CartItem.builder()
+                .item(savedItem1)
+                .member(member)
+                .count(1)
                 .build();
-        orderService.order(member.getId(), orderCreateDto);
+        CartItem cartItem2 = CartItem.builder()
+                .item(savedItem2)
+                .member(member)
+                .count(2)
+                .build();
+        CartItem cartItem3 = CartItem.builder()
+                .item(savedItem3)
+                .member(member)
+                .count(2)
+                .build();
+        cartItemRepository.save(cartItem1);
+        cartItemRepository.save(cartItem2);
+        cartItemRepository.save(cartItem3);
+
+        // when
+        List<Long> cartItemIds = List.of(cartItem1.getId(), cartItem3.getId());
+        OrderByCartCreateDto orderByCartCreateDto = OrderByCartCreateDto.builder()
+                .cartItemIds(cartItemIds)
+                .build();
+        orderService.order(member.getId(), orderByCartCreateDto);
 
         // then
         Item orderedItem1 = itemRepository.findById(savedItem1.getId())
@@ -94,15 +117,20 @@ class OrderServiceTest {
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
         Item orderedItem3 = itemRepository.findById(savedItem3.getId())
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
-        assertEquals(savedItem1.getStock() - 1, orderedItem1.getStock()); // 주문 수량만큼 재고 소모
-        assertEquals(savedItem2.getStock() - 2, orderedItem2.getStock());
-        assertEquals(savedItem3.getStock(), orderedItem3.getStock()); // 주문 안된 상품은 재고 소모 X
+
+        assertEquals(savedItem1.getStock() - 1, orderedItem1.getStock()); // 주문 수량만큼 재고 소모1
+        assertEquals(savedItem2.getStock(), orderedItem2.getStock()); // 장바구니에 담는 것만으로는 재고가 소모되지 않는다.
+        assertEquals(savedItem3.getStock() - 2, orderedItem3.getStock()); // 주문 수량만큼 재고 소모2
 
         // 주문의 수는 1개
         assertEquals(1, orderRepository.count());
+
         // 주문 상태
         Order savedOrder = orderRepository.findAll().get(0);
         assertEquals(OrderStatus.ORDER, savedOrder.getOrderStatus());
+
+        // 주문한 장바구니 상품은 삭제된다.
+        assertEquals(1L, cartItemRepository.count());
     }
 
 
@@ -127,15 +155,20 @@ class OrderServiceTest {
                 .build();
         itemRepository.save(item);
 
+        CartItem cartItem = CartItem.builder()
+                .item(item)
+                .count(2)
+                .member(member)
+                .build();
+        cartItemRepository.save(cartItem);
+
         // when
-        HashMap<Long, Integer> info = new HashMap<>();
-        info.put(item.getId(), 2);
-        OrderCreateDto orderCreateDto = OrderCreateDto.builder()
-                .orderInfo(info)
+        OrderByCartCreateDto orderByCartCreateDto = OrderByCartCreateDto.builder()
+                .cartItemIds(List.of(cartItem.getId()))
                 .build();
         // then
         ItemException exception = assertThrows(ItemException.class,
-                () -> orderService.order(member.getId(), orderCreateDto));
+                () -> orderService.order(member.getId(), orderByCartCreateDto));
         assertEquals(ItemExceptionType.ITEM_NOT_ENOUGH, exception.getExceptionType());
     }
 
@@ -203,16 +236,19 @@ class OrderServiceTest {
                 .stock(3)
                 .description("그림의 떡")
                 .build();
-        itemRepository.save(item); // 상품
+        itemRepository.save(item);
 
-        HashMap<Long, Integer> info = new HashMap<>(); // 주문서
-        info.put(item.getId(), 1);
-        OrderInfoResponseDto responseDto = orderService.order(
-                        member.getId(),
-                        OrderCreateDto.builder()
-                                .orderInfo(info)
-                                .build()
-                );// 주문
+        CartItem cartItem = CartItem.builder()
+                .item(item)
+                .member(member)
+                .count(1)
+                .build();
+        cartItemRepository.save(cartItem);
+
+        OrderByCartCreateDto createDto = OrderByCartCreateDto.builder()
+                .cartItemIds(List.of(cartItem.getId()))
+                .build();
+        OrderInfoResponseDto responseDto = orderService.order(member.getId(), createDto);
 
         // when - 주문 취소
         orderService.cancelOrder(responseDto.getId());

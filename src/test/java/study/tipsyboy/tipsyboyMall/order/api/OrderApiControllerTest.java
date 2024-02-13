@@ -14,13 +14,15 @@ import study.tipsyboy.tipsyboyMall.annotation.CustomWithMockUser;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
+import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
+import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
 import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderByCartCreateDto;
 import study.tipsyboy.tipsyboyMall.order.service.OrderService;
 
 import java.util.HashMap;
@@ -55,9 +57,13 @@ class OrderApiControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
     @AfterEach
     public void after() {
         orderRepository.deleteAll();
+        cartItemRepository.deleteAll();
         itemRepository.deleteAll();
         memberRepository.deleteAll();
     }
@@ -67,15 +73,10 @@ class OrderApiControllerTest {
     @DisplayName("주문 실패 - 등록되지 않은 상품")
     public void orderFailureItemNotFound() throws Exception {
         // expected
-        HashMap<Long, Integer> orderInfoMap = new HashMap<>();
-        orderInfoMap.put(1L, 1);
-        orderInfoMap.put(2L, 1);
-        orderInfoMap.put(3L, 1);
-
-        OrderCreateDto orderCreateDto = OrderCreateDto.builder()
-                .orderInfo(orderInfoMap)
+        OrderByCartCreateDto orderByCartCreateDto = OrderByCartCreateDto.builder()
+                .cartItemIds(List.of(1L, 2L, 3L))
                 .build();
-        String json = objectMapper.writeValueAsString(orderCreateDto);
+        String json = objectMapper.writeValueAsString(orderByCartCreateDto);
 
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,14 +111,18 @@ class OrderApiControllerTest {
                 .build();
         itemRepository.save(item);
 
-        // expected
-        HashMap<Long, Integer> orderInfoMap = new HashMap<>();
-        orderInfoMap.put(item.getId(), 2);
-
-        OrderCreateDto orderCreateDto = OrderCreateDto.builder()
-                .orderInfo(orderInfoMap)
+        CartItem cartItem = CartItem.builder()
+                .item(item)
+                .member(buyer)
+                .count(2)
                 .build();
-        String json = objectMapper.writeValueAsString(orderCreateDto);
+        cartItemRepository.save(cartItem);
+
+        // expected
+        OrderByCartCreateDto orderByCartCreateDto = OrderByCartCreateDto.builder()
+                .cartItemIds(List.of(cartItem.getId()))
+                .build();
+        String json = objectMapper.writeValueAsString(orderByCartCreateDto);
 
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -126,15 +131,6 @@ class OrderApiControllerTest {
                 .andExpect(jsonPath("$.message").value("상품 재고가 부족합니다."))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
-    }
-
-    @Test
-    @DisplayName("주문 실패 - 잔액 부족")
-    public void orderFailureInsufficientBalance() throws Exception {
-        // TODO: 주문 실패 - 잔액 부족
-        // given
-        // when
-        // then
     }
 
     @Test
@@ -163,31 +159,30 @@ class OrderApiControllerTest {
                 .collect(Collectors.toList());
         itemRepository.saveAll(items);
 
-        // expected
-        HashMap<Long, Integer> orderInfoMap = new HashMap<>();
-        Long itemId1 = itemRepository.findAll().get(0).getId();
-        Long itemId2 = itemRepository.findAll().get(1).getId();
-        Long itemId3 = itemRepository.findAll().get(2).getId();
-        orderInfoMap.put(itemId1, 1);
-        orderInfoMap.put(itemId2, 2);
-        orderInfoMap.put(itemId3, 3);
+        List<CartItem> cartItems = IntStream.range(0, 2)
+                .mapToObj(i -> CartItem.builder()
+                        .member(buyer)
+                        .item(items.get(i))
+                        .count(1)
+                        .build())
+                .collect(Collectors.toList());
+        cartItemRepository.saveAll(cartItems);
 
-        OrderCreateDto orderCreateDto = OrderCreateDto.builder()
-                .orderInfo(orderInfoMap)
+        // expected
+        OrderByCartCreateDto orderByCartCreateDto = OrderByCartCreateDto.builder()
+                .cartItemIds(List.of(cartItems.get(0).getId(), cartItems.get(1).getId()))
                 .build();
-        String json = objectMapper.writeValueAsString(orderCreateDto);
+        String json = objectMapper.writeValueAsString(orderByCartCreateDto);
 
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orderStatus").value("ORDER"))
-                .andExpect(jsonPath("$.orderItemList[0].itemId").value(itemId1))
+                .andExpect(jsonPath("$.orderItemList[0].itemId").value(items.get(0).getId()))
                 .andExpect(jsonPath("$.orderItemList[0].orderPrice").value(1))
-                .andExpect(jsonPath("$.orderItemList[1].itemId").value(itemId2))
+                .andExpect(jsonPath("$.orderItemList[1].itemId").value(items.get(1).getId()))
                 .andExpect(jsonPath("$.orderItemList[1].orderPrice").value(2))
-                .andExpect(jsonPath("$.orderItemList[2].itemId").value(itemId3))
-                .andExpect(jsonPath("$.orderItemList[2].orderPrice").value(3))
                 .andDo(print());
     }
 

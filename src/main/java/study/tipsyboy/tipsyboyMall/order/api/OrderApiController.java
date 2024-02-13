@@ -8,9 +8,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderCreateDto;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderByCartCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.order.dto.OrderPreviewItemResponseDto;
 import study.tipsyboy.tipsyboyMall.order.service.OrderService;
 
 import java.util.List;
@@ -24,10 +25,10 @@ public class OrderApiController {
     private final OrderService orderService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
     public ResponseEntity<OrderInfoResponseDto> createOrder(@AuthenticationPrincipal LoginMember loginMember,
-                                                            @RequestBody OrderCreateDto orderCreateDto) {
-        return ResponseEntity.ok(orderService.order(loginMember.getMemberId(), orderCreateDto));
+                                                            @RequestBody OrderByCartCreateDto orderByCartCreateDto) {
+        return ResponseEntity.ok(orderService.order(loginMember.getMemberId(), orderByCartCreateDto));
     }
 
     @GetMapping("/{orderId}")
@@ -50,5 +51,11 @@ public class OrderApiController {
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
         return ResponseEntity.ok().build();
+    }
+
+    // order preview
+    @PostMapping("/preview")
+    public ResponseEntity<List<OrderPreviewItemResponseDto>> viewOrderPreview(@RequestBody List<Long> selectedItems) {
+        return ResponseEntity.ok(orderService.preview(selectedItems));
     }
 }
