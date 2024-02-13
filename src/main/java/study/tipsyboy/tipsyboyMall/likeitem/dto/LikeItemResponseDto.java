@@ -3,7 +3,6 @@ package study.tipsyboy.tipsyboyMall.likeitem.dto;
 import lombok.Getter;
 import study.tipsyboy.tipsyboyMall.likeitem.domain.LikeItem;
 
-import java.time.LocalDateTime;
 
 @Getter
 public class LikeItemResponseDto {

@@ -44,8 +44,8 @@ class LikeItemServiceTest {
 
     @AfterEach
     public void after() {
-        itemRepository.deleteAll();
         likeItemRepository.deleteAll();
+        itemRepository.deleteAll();
         memberRepository.deleteAll();
         em.clear();
     }
