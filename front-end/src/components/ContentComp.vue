@@ -6,7 +6,7 @@
 
 <style>
 .content {
-  height: calc(100vh - 60px);
+  height: 100vh;
   margin-top: 5%;
   max-width: 70%;
   margin-left: 15%;

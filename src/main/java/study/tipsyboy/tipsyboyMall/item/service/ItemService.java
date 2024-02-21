@@ -64,13 +64,6 @@ public class ItemService {
         return new ItemResponseDto(item);
     }
 
-    // TODO: 삭제?
-    public List<ItemResponseDto> getAllItems() {
-        return itemRepository.findAll().stream()
-                .map(ItemResponseDto::new)
-                .collect(Collectors.toList());
-    }
-
     public Page<ItemResponseDto> getItemsForPage(ItemSearchReqDto requestDto) {
         Page<Item> resultPage = itemRepository.getItems(requestDto, createPageable(requestDto));
 
@@ -81,13 +74,17 @@ public class ItemService {
         return new PageImpl<>(items, resultPage.getPageable(), resultPage.getTotalElements());
     }
 
-    public List<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto pagingRequestDto) {
+    public Page<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto requestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
-        return itemRepository.getMyItems(pagingRequestDto, member).stream()
+        Page<Item> resultPage = itemRepository.getMyItems(requestDto, member, createPageable(requestDto));
+
+        List<ItemResponseDto> myItems = resultPage.stream()
                 .map(ItemResponseDto::new)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(myItems, resultPage.getPageable(), resultPage.getTotalElements());
     }
 
     @Transactional

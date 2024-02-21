@@ -20,7 +20,9 @@
       <template v-else>
         <el-sub-menu index="" class="mr-3">
           <template #title>{{ memberStore.userInfo.nickname }}</template>
-          <el-menu-item :index="`/profile/${memberStore.userInfo.nickname}`"> 프로필 </el-menu-item>
+          <el-menu-item :index="`/profile/${memberStore.userInfo.nickname}`">
+            마이페이지
+          </el-menu-item>
           <el-menu-item index="/item/save">상품 등록</el-menu-item>
           <el-menu-item @click="logout">로그아웃</el-menu-item>
         </el-sub-menu>

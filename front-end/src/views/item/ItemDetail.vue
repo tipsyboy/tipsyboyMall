@@ -1,39 +1,44 @@
 <template>
-  <div>
-    <el-empty :image-size="150" v-if="!itemInfo.itemImages || itemInfo.itemImages.length === 0" />
-    <el-carousel indicator-position="outside" :pause-on-hover="true" height="430px">
-      <el-carousel-item v-for="(itemImage, index) in itemInfo.itemImages" :key="index">
-        <img class="item-image" :src="getImageUrl(itemImage.storedName)" />
-      </el-carousel-item>
-    </el-carousel>
-  </div>
+  <div class="item-detail-container">
+    <div>
+      <el-empty :image-size="150" v-if="!itemInfo.itemImages || itemInfo.itemImages.length === 0" />
+      <el-carousel indicator-position="outside" :pause-on-hover="true" height="430px">
+        <el-carousel-item v-for="(itemImage, index) in itemInfo.itemImages" :key="index">
+          <img class="item-image" :src="getImageUrl(itemImage.storedName)" />
+        </el-carousel-item>
+      </el-carousel>
+    </div>
 
-  <div class="item-header">
-    <h1 class="item-name">{{ itemInfo.itemName }}</h1>
-    <div class="item-btn" v-if="isOwner()">
-      <el-button type="primary" @click="toEditPage" :icon="Edit" circle />
-      <el-button type="danger" @click="deleteItem" :icon="Delete" circle />
+    <div class="item-header">
+      <h1 class="item-name">{{ itemInfo.itemName }}</h1>
+      <div class="item-btn" v-if="isOwner()">
+        <el-button type="primary" @click="toEditPage" :icon="Edit" circle />
+        <el-button type="danger" @click="deleteItem" :icon="Delete" circle />
+      </div>
     </div>
-  </div>
-  <el-divider />
-  <div class="item-info-container">
-    <div class="item-info-left">
-      <el-descriptions :column="1" size="large">
-        <el-descriptions-item label="판매자">{{ itemInfo.seller }}</el-descriptions-item>
-        <el-descriptions-item label="가격">{{ itemInfo.price }}</el-descriptions-item>
-        <el-descriptions-item label="재고">{{ itemInfo.stock }}</el-descriptions-item>
-        <el-descriptions-item label="상태">{{ itemInfo.status }}</el-descriptions-item>
-      </el-descriptions>
+    <el-divider />
+    <div class="item-info-container">
+      <div class="item-info-left">
+        <el-descriptions :column="1" size="large">
+          <el-descriptions-item label="판매자">{{ itemInfo.seller }}</el-descriptions-item>
+          <el-descriptions-item label="가격">{{ itemInfo.price }}</el-descriptions-item>
+          <el-descriptions-item label="재고">{{ itemInfo.stock }}</el-descriptions-item>
+          <el-descriptions-item label="상태">{{ itemInfo.status }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <div class="item-info-right">
+        <el-descriptions>
+          <el-descriptions-item>{{
+            formatDateTime(itemInfo.createdDate)
+          }}</el-descriptions-item></el-descriptions
+        >
+        <el-button type="info" plain>카트에 담기</el-button>
+      </div>
     </div>
-    <div class="item-info-right">
-      <el-descriptions>
-        <el-descriptions-item>{{ formatDateTime(itemInfo.createdDate) }}</el-descriptions-item>
-      </el-descriptions>
+    <el-divider />
+    <div class="item-description">
+      <div>{{ itemInfo.description }}</div>
     </div>
-  </div>
-  <el-divider />
-  <div class="item-description">
-    <div>{{ itemInfo.description }}</div>
   </div>
 </template>
 
@@ -42,6 +47,8 @@ import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import moment from 'moment'
+import { markRaw } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Edit } from '@element-plus/icons-vue'
 import useMemberStore from '@/stores/memberInfo'
 
@@ -73,21 +80,30 @@ const formatDateTime = (dateTime: any) => {
 }
 
 const deleteItem = () => {
-  const confirmDelete = window.confirm('정말로 삭제하시겠습니까?')
-
-  if (confirmDelete) {
-    axios
-      .delete(`http://localhost:8080/items/${itemInfo.value.itemId}`, {
-        withCredentials: true
-      })
-      .then(() => {
-        alert('삭제되었습니다.')
-        router.push({ name: 'itemList' })
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-  }
+  ElMessageBox.confirm('정말로 삭제하시겠습니까?', '삭제', {
+    type: 'warning',
+    icon: markRaw(Delete)
+  })
+    .then(() => {
+      axios
+        .delete(`http://localhost:8080/items/${itemInfo.value.itemId}`, {
+          withCredentials: true
+        })
+        .then(() => {
+          ElMessage({
+            message: '삭제되었습니다.',
+            type: 'success'
+          })
+          router.push({ name: 'itemList' })
+        })
+        .catch((error) => {
+          console.error(error)
+          ElMessage.error('삭제할 수 없습니다.')
+        })
+    })
+    .catch(() => {
+      console.log('삭제 취소')
+    })
 }
 
 const toEditPage = () => {
