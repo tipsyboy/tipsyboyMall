@@ -12,5 +12,5 @@ public interface ItemRepositoryCustom {
 
     Page<Item> getItems(ItemSearchReqDto pagingRequestDto, Pageable pageable);
 
-    List<Item> getMyItems(ItemSearchReqDto pagingRequestDto, Member member);
+    Page<Item> getMyItems(ItemSearchReqDto pagingRequestDto, Member member, Pageable pageable);
 }
