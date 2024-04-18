@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public class CartItemUpdateRequestDto {
 
-    private Long itemId;
+    private Long cartItemId;
 
     private Integer count; // 수량
 
     @Builder
-    public CartItemUpdateRequestDto(Long itemId, Integer count) {
-        this.itemId = itemId;
+    public CartItemUpdateRequestDto(Long cartItemId, Integer count) {
+        this.cartItemId = cartItemId;
         this.count = count;
     }
 }

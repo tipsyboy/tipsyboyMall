@@ -29,6 +29,12 @@ public class CartItemApiController {
         return ResponseEntity.ok(cartItemService.save(loginMember.getMemberId(), requestDto));
     }
 
+    @GetMapping("/byIds")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
+    public ResponseEntity<List<CartItemResponseDto>> getCartItemsById(@RequestParam("ids") List<Long> cartItemIds) {
+        return ResponseEntity.ok(cartItemService.readCartItemsByIds(cartItemIds));
+    }
+
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
     public ResponseEntity<List<CartItemResponseDto>> getCartItems(@AuthenticationPrincipal LoginMember loginMember) {

@@ -6,9 +6,19 @@ import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
 @Getter
 public class OrderPreviewItemResponseDto {
 
-    private final String itemName;
-    private final Integer price;
-    private final Integer stock;
+    private Long cartItemId;
+
+    private Long itemId;
+
+    private String itemName;
+
+    private String itemThumnailImage;
+
+    private Integer price;
+
+    private Integer count;
+
+    private Integer stock;
 
     public OrderPreviewItemResponseDto(CartItem cartItem) {
         this.itemName = cartItem.getItem().getItemName();

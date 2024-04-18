@@ -1,31 +1,33 @@
 <template>
-  <el-table
-    :data="items"
-    @row-click="showItemDetail"
-    style="width: 100%"
-    :row-class-name="rowClassName"
-  >
-    <el-table-column prop="itemId" label="No" width="50" />
-    <el-table-column label="카테고리">카테고리</el-table-column>
-    <el-table-column prop="itemName" label="상품명" width="180"> </el-table-column>
-    <el-table-column prop="status" label="상태" width="180" />
-    <el-table-column prop="seller" label="작성자" width="180" />
-    <el-table-column :prop="'createdDate'" label="날짜">
-      <template v-slot="{ row }">
-        {{ formatDateTime(row.createdDate) }}
-      </template>
-    </el-table-column>
-    <el-table-column prop="xxx" label="조회수" />
-  </el-table>
-  <el-pagination
-    :hide-on-single-page="true"
-    class="paging-bar"
-    background
-    layout="prev, pager, next"
-    @current-change="handlePageChange"
-    :default-page-size="pageSize"
-    :total="totalCount"
-  />
+  <CenterLayout>
+    <el-table
+      :data="items"
+      @row-click="showItemDetail"
+      style="width: 100%"
+      :row-class-name="rowClassName"
+    >
+      <el-table-column prop="itemId" label="No" width="50" />
+      <el-table-column label="카테고리">카테고리</el-table-column>
+      <el-table-column prop="itemName" label="상품명" width="180"> </el-table-column>
+      <el-table-column prop="status" label="상태" width="180" />
+      <el-table-column prop="seller" label="작성자" width="180" />
+      <el-table-column :prop="'createdDate'" label="날짜">
+        <template v-slot="{ row }">
+          {{ formatDateTime(row.createdDate) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="xxx" label="조회수" />
+    </el-table>
+    <el-pagination
+      :hide-on-single-page="true"
+      class="paging-bar"
+      background
+      layout="prev, pager, next"
+      @current-change="handlePageChange"
+      :default-page-size="pageSize"
+      :total="totalCount"
+    />
+  </CenterLayout>
 </template>
 
 <script lang="ts" setup>
