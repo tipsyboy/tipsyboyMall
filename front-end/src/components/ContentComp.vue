@@ -1,14 +1,15 @@
 <template>
-  <el-main class="content">
+  <div class="content">
     <RouterView />
-  </el-main>
+  </div>
 </template>
 
 <style>
 .content {
-  height: 100vh;
-  margin-top: 5%;
+  min-height: 100vh;
+  /* padding: 0px 0px; */
+  /* margin-top: 5%;
   max-width: 70%;
-  margin-left: 15%;
+  margin-left: 15%; */
 }
 </style>

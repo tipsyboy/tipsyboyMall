@@ -1,8 +1,8 @@
 <template>
-  <div class="item-detail-container">
+  <CenterLayout>
     <div>
       <el-empty :image-size="150" v-if="!itemInfo.itemImages || itemInfo.itemImages.length === 0" />
-      <el-carousel indicator-position="outside" :pause-on-hover="true" height="430px">
+      <el-carousel v-else indicator-position="outside" :pause-on-hover="true" height="430px">
         <el-carousel-item v-for="(itemImage, index) in itemInfo.itemImages" :key="index">
           <img class="item-image" :src="getImageUrl(itemImage.storedName)" />
         </el-carousel-item>
@@ -23,23 +23,30 @@
           <el-descriptions-item label="판매자">{{ itemInfo.seller }}</el-descriptions-item>
           <el-descriptions-item label="가격">{{ itemInfo.price }}</el-descriptions-item>
           <el-descriptions-item label="재고">{{ itemInfo.stock }}</el-descriptions-item>
-          <el-descriptions-item label="상태">{{ itemInfo.status }}</el-descriptions-item>
+          <el-descriptions-item>{{ formatDateTime(itemInfo.createdDate) }}</el-descriptions-item>
         </el-descriptions>
       </div>
       <div class="item-info-right">
-        <el-descriptions>
-          <el-descriptions-item>{{
-            formatDateTime(itemInfo.createdDate)
-          }}</el-descriptions-item></el-descriptions
-        >
-        <el-button type="info" plain>카트에 담기</el-button>
+        <el-descriptions :column="1">
+          <el-descriptions-item label="상태">{{ itemInfo.status }}</el-descriptions-item>
+          <el-descriptions-item
+            ><el-input-number v-model="count" :min="1" :max="itemInfo.stock" label="수량"
+          /></el-descriptions-item>
+          <el-descriptions-item
+            ><el-button type="info" plain @click="addToCart"
+              >카트에 담기</el-button
+            ></el-descriptions-item
+          >
+        </el-descriptions>
       </div>
     </div>
     <el-divider />
     <div class="item-description">
       <div>{{ itemInfo.description }}</div>
     </div>
-  </div>
+    <el-divider />
+    <CommentVue />
+  </CenterLayout>
 </template>
 
 <script setup lang="ts">
@@ -51,15 +58,18 @@ import { markRaw } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Edit } from '@element-plus/icons-vue'
 import useMemberStore from '@/stores/memberInfo'
+import CommentVue from '../comment/CommentVue.vue'
 
 const route = useRoute()
 const router = useRouter()
 const itemInfo = ref<any>([])
 const memberStore = useMemberStore()
+const count = ref(1)
+const requestUrl = 'http://localhost:8080/items'
 
 onMounted(() => {
   axios
-    .get(`http://localhost:8080/items/${route.params.itemId}`, {
+    .get(`${requestUrl}/${route.params.itemId}`, {
       withCredentials: true
     })
     .then((response) => {
@@ -84,8 +94,8 @@ const deleteItem = () => {
     type: 'warning',
     icon: markRaw(Delete)
   })
-    .then(() => {
-      axios
+    .then(async () => {
+      await axios
         .delete(`http://localhost:8080/items/${itemInfo.value.itemId}`, {
           withCredentials: true
         })
@@ -112,8 +122,37 @@ const toEditPage = () => {
 }
 
 const getImageUrl = (storedName: string) => {
-  // 이미지 파일이 저장된 경로에 따라 수정이 필요할 수 있습니다.
   return `http://localhost:8080/images/${storedName}`
+}
+
+const addToCart = () => {
+  const cartItem = {
+    itemId: itemInfo.value.itemId, // 상품 ID
+    count: count.value // 상품 수량
+  }
+  axios
+    .post('http://localhost:8080/api/cartItem', cartItem, {
+      withCredentials: true
+    })
+    .then(() => {
+      ElMessageBox.confirm(
+        '상품이 장바구니에 추가되었습니다. 장바구니로 이동 하시겠습니까?',
+        '알림',
+        {
+          confirmButtonText: '확인',
+          cancelButtonText: '취소',
+          type: 'success'
+        }
+      )
+        .then(() => {
+          router.replace('/cart')
+        })
+        .catch(() => {})
+    })
+    .catch((error) => {
+      console.error('카트에 상품을 추가하는 도중 에러 발생:', error)
+      ElMessage.error('상품을 장바구니에 추가할 수 없습니다.')
+    })
 }
 </script>
 

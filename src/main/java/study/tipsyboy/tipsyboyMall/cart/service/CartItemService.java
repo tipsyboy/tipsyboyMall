@@ -8,6 +8,7 @@ import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
+import study.tipsyboy.tipsyboyMall.cart.dto.CartItemIdsDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemResponseDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSaveRequestDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemUpdateRequestDto;
@@ -18,6 +19,7 @@ import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -39,6 +41,12 @@ public class CartItemService {
         Item item = itemRepository.findById(requestDto.getItemId())
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
+        Optional<CartItem> findCartItem = cartItemRepository.findByMemberAndItem(member, item);
+        if (findCartItem.isPresent()) {
+            findCartItem.get().updateCount(requestDto.getCount());
+            return findCartItem.get().getId();
+        }
+
         CartItem cartItem = CartItem.builder()
                 .member(member)
                 .item(item)
@@ -50,6 +58,12 @@ public class CartItemService {
 
     public List<CartItemResponseDto> readCartItems(Long memberId) {
         return cartItemRepository.findByMemberId(memberId).stream()
+                .map(CartItemResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<CartItemResponseDto> readCartItemsByIds(List<Long> cartItemIds) {
+        return cartItemRepository.findByIdIn(cartItemIds).stream()
                 .map(CartItemResponseDto::new)
                 .collect(Collectors.toList());
     }

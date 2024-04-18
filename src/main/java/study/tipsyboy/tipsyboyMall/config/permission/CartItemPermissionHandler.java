@@ -25,7 +25,7 @@ public class CartItemPermissionHandler implements PermissionHandler {
         log.info("[CartItem - Permission Handler]");
 
         LoginMember loginMember = (LoginMember) authentication.getPrincipal();
-        CartItem cartItem = cartItemRepository.findById((Long) targetId)
+        CartItem cartItem = cartItemRepository.findById(targetId)
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
         if (!cartItem.getMember().getId().equals(loginMember.getMemberId())) {

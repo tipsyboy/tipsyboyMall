@@ -1,6 +1,7 @@
 <template>
   <el-header class="navbar">
     <el-menu
+      class="navbar__menu"
       mode="horizontal"
       background-color="#545c64"
       text-color="#fff"
@@ -9,7 +10,6 @@
       router
     >
       <el-menu-item index="/">Home</el-menu-item>
-      <el-menu-item index="/order">Orders</el-menu-item>
       <el-menu-item index="/item/list">item list</el-menu-item>
 
       <div class="flex-grow" />
@@ -23,6 +23,7 @@
           <el-menu-item :index="`/profile/${memberStore.userInfo.nickname}`">
             마이페이지
           </el-menu-item>
+          <el-menu-item index="/cart">장바구니</el-menu-item>
           <el-menu-item index="/item/save">상품 등록</el-menu-item>
           <el-menu-item @click="logout">로그아웃</el-menu-item>
         </el-sub-menu>
@@ -45,6 +46,10 @@ const logout = () => {
 .navbar {
   padding: 0;
 }
+.navbar .navbar__menu {
+  border: 0;
+}
+
 .flex-grow {
   flex-grow: 1;
 }
