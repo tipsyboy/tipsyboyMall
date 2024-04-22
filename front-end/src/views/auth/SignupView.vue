@@ -1,20 +1,20 @@
 <template>
   <CenterLayout>
     <h2>회원가입</h2>
-    <el-form :model="form" class="signupForm" label-width="90px" status-icon>
+    <el-form label-width="90px">
       <el-form-item label="email" size="large">
-        <el-input v-model="form.email" placeholder="이메일을 입력하세요." />
+        <el-input v-model="state.signupForm.email" placeholder="이메일을 입력하세요." />
       </el-form-item>
       <el-form-item label="password" size="large">
         <el-input
-          v-model="form.password"
+          v-model="state.signupForm.password"
           type="password"
           placeholder="비밀번호를 입력하세요."
           show-password
         />
       </el-form-item>
       <el-form-item label="nickname" size="large">
-        <el-input v-model="form.nickname" placeholder="닉네임을 입력하세요." />
+        <el-input v-model="state.signupForm.nickname" placeholder="닉네임을 입력하세요." />
       </el-form-item>
 
       <el-form-item size="large">
@@ -25,38 +25,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import axios from 'axios'
-import router from '@/router'
+import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+import SignupForm from '@/entity/member/SignupForm'
+import HttpError from '@/http/HttpError'
+import { container } from 'tsyringe'
+import MemberRepository from '@/repository/MemberRepository'
 
-const requestUrl = 'http://localhost:8080/auth/signup'
-const form = ref({
-  email: '',
-  password: '',
-  nickname: ''
+const router = useRouter()
+const state = reactive({
+  signupForm: new SignupForm()
 })
+const MEMBER_REPOSITORY = container.resolve(MemberRepository)
 
 const signup = () => {
-  axios
-    .post(requestUrl, {
-      email: form.value.email,
-      password: form.value.password,
-      nickname: form.value.nickname
-    })
+  MEMBER_REPOSITORY.signup(state.signupForm)
     .then(() => {
-      ElMessage({
-        message: '회원가입이 정상적으로 완료되었습니다.',
-        type: 'success'
-      })
-      router.push({ name: 'login' })
+      ElMessage({ type: 'success', message: '환영합니다. :) 로그인 해주세요!' })
+      router.replace('/login')
     })
-    .catch((error) => {
-      ElMessage({
-        message: '회원가입에 실패하였습니다.',
-        type: 'error'
-      })
-      console.error(error)
+    .catch((e: HttpError) => {
+      ElMessage({ type: 'error', message: e.getMessage() })
     })
 }
 </script>

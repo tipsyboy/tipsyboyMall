@@ -37,66 +37,69 @@ const router = createRouter({
       name: 'login',
       component: LoginView
     },
-    // personal
-    {
-      path: "/profile/:nickname",
-      name: "profile",
-      component: ProfileView
-    },
-    {
-      path: "/profile/:nickname/my-item",
-      name: "my-item",
-      component: MyItem
-    },
-    {
-      path: "/profile/:nickname/my-order",
-      name: "my-order",
-      component: MyOrder
-    },
-    {
-      path: '/cart',
-      name: 'cart',
-      component: CartView
-    },
-    // items
-    {
-      path: '/item/save',
-      name: 'itemCreate',
-      component: ItemCreate
-    },
-    {
-      path: '/item/list',
-      name: 'itemList',
-      component: ItemList
-    },
-    {
-      path: '/item/:itemId',
-      name: 'itemDetail',
-      component: ItemDetail
-    },
-    {
-      path: '/item/edit/:itemId',
-      name: 'itemEdit',
-      component: ItemEdit
-    },
-    // order
-    {
-      path: '/order',
-      name: 'order',
-      component: OrderView
-    },
-    {
-      path: '/order/:orderId',
-      name: 'orderDetail',
-      component: OrderDetail
-    },
+    
+        // // items
+    // {
+    //   path: '/item/save',
+    //   name: 'itemCreate',
+    //   component: ItemCreate
+    // },
+    // {
+    //   path: '/item/list',
+    //   name: 'itemList',
+    //   component: ItemList
+    // },
+    // {
+    //   path: '/item/:itemId',
+    //   name: 'itemDetail',
+    //   component: ItemDetail
+    // },
+    // {
+    //   path: '/item/edit/:itemId',
+    //   name: 'itemEdit',
+    //   component: ItemEdit
+    // },
 
-    // temp
-    {
-      path: '/temp',
-      name: 'temp',
-      component: TempView
-    },
+    // // personal
+    // {
+    //   path: "/profile/:nickname",
+    //   name: "profile",
+    //   component: ProfileView
+    // },
+    // {
+    //   path: "/profile/:nickname/my-item",
+    //   name: "my-item",
+    //   component: MyItem
+    // },
+    // {
+    //   path: "/profile/:nickname/my-order",
+    //   name: "my-order",
+    //   component: MyOrder
+    // },
+    // {
+    //   path: '/cart',
+    //   name: 'cart',
+    //   component: CartView
+    // },
+
+    // // order
+    // {
+    //   path: '/order',
+    //   name: 'order',
+    //   component: OrderView
+    // },
+    // {
+    //   path: '/order/:orderId',
+    //   name: 'orderDetail',
+    //   component: OrderDetail
+    // },
+
+    // // temp
+    // {
+    //   path: '/temp',
+    //   name: 'temp',
+    //   component: TempView
+    // },
   ]
 })
 

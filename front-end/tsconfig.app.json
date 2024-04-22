@@ -10,6 +10,8 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "composite": true,
     "noEmit": false,
     "baseUrl": ".",
