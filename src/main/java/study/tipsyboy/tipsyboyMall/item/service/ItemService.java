@@ -39,7 +39,8 @@ public class ItemService {
     private final FileStore fileStore;
 
     @Transactional
-    public Long saveItem(ItemCreateDto itemCreateDto, Long memberId, List<MultipartFile> imageFiles) throws IOException {
+    public Long saveItem(ItemCreateDto itemCreateDto, Long memberId,
+                         List<MultipartFile> imageFiles) throws IOException {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 

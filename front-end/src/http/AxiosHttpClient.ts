@@ -3,6 +3,7 @@ import HttpError from '@/http/HttpError'
 import { singleton } from 'tsyringe'
 
 export type HttpRequestConfig = {
+    headers?: Record<string, string>
     method?: 'GET' | 'POST' | 'PUT' |'PATCH' | 'DELETE'
     path: string
     params?: any
@@ -19,10 +20,11 @@ export default class AxiosHttpClient {
 
     public async request(config: HttpRequestConfig) {
         return this.client.request({
+            headers: config.headers,
             method: config.method,
             url: config.path,
             params: config.params,
-            data: config.body
+            data: config.body,
         })
         .then((response: AxiosResponse) => {
             return response.data

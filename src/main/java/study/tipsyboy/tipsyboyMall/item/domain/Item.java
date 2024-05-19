@@ -28,6 +28,8 @@ public class Item extends BaseTimeEntity {
     private String itemName;
     private int price;
     private int stock; // 재고
+
+    @Lob
     private String description; // 상품
 
     private int likes;

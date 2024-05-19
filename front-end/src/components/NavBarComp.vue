@@ -13,34 +13,20 @@
       <el-menu-item index="/item/list">item list</el-menu-item>
 
       <div class="flex-grow" />
-      <template v-if="!memberStore.isLogin">
-        <el-menu-item index="/login">Login</el-menu-item>
-        <el-menu-item index="/signup">Sign up</el-menu-item>
-      </template>
-      <template v-else>
-        <el-sub-menu index="" class="mr-3">
-          <template #title>{{ memberStore.userInfo.nickname }}</template>
-          <el-menu-item :index="`/profile/${memberStore.userInfo.nickname}`">
-            마이페이지
-          </el-menu-item>
-          <el-menu-item index="/cart">장바구니</el-menu-item>
-          <el-menu-item index="/item/save">상품 등록</el-menu-item>
-          <el-menu-item @click="logout">로그아웃</el-menu-item>
-        </el-sub-menu>
-      </template>
+      <el-menu-item index="/login">Login</el-menu-item>
+      <el-menu-item index="/signup">Sign up</el-menu-item>
+      <el-sub-menu index="" class="mr-3">
+        <template #title>메뉴창 - 유저 닉네임</template>
+        <el-menu-item index="/profile"> 마이페이지 </el-menu-item>
+        <el-menu-item index="/cart">장바구니</el-menu-item>
+        <el-menu-item index="/item/save">상품 등록</el-menu-item>
+        <el-menu-item>로그아웃</el-menu-item>
+      </el-sub-menu>
     </el-menu>
   </el-header>
 </template>
 
-<script lang="ts" setup>
-import useMemberStore from '@/stores/memberInfo'
-
-const memberStore = useMemberStore()
-
-const logout = () => {
-  memberStore.logout()
-}
-</script>
+<script lang="ts" setup></script>
 
 <style scoped>
 .navbar {

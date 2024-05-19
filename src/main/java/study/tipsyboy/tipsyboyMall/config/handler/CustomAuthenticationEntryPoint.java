@@ -25,7 +25,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
 
-        log.error("[인증 오류] 로그인이 필요합니다.");
+        log.error("[인증 오류] 로그인 하지 않은 사용자");
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -33,7 +33,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .statusCode("401")
-                .message("로그인이 필요합니다.")
+                .message("로그인이 필요한 서비스입니다.")
                 .build();
         String json = objectMapper.writeValueAsString(errorResponse);
 

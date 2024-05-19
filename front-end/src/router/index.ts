@@ -38,22 +38,23 @@ const router = createRouter({
       component: LoginView
     },
     
-        // // items
-    // {
-    //   path: '/item/save',
-    //   name: 'itemCreate',
-    //   component: ItemCreate
-    // },
+    // items
+    {
+      path: '/item/save',
+      name: 'itemCreate',
+      component: ItemCreate
+    },
     // {
     //   path: '/item/list',
     //   name: 'itemList',
     //   component: ItemList
     // },
-    // {
-    //   path: '/item/:itemId',
-    //   name: 'itemDetail',
-    //   component: ItemDetail
-    // },
+    {
+      path: '/item/:itemId',
+      name: 'itemDetail',
+      component: ItemDetail,
+      props: true
+    },
     // {
     //   path: '/item/edit/:itemId',
     //   name: 'itemEdit',
