@@ -21,7 +21,7 @@ public class ItemResponseDto {
     private final String seller;
     private final Integer price;
     private final Integer stock;
-    private final String description; // TODO: 삭제?
+    private final String description;
     private final LocalDateTime createdDate;
 
     private final List<ItemFileResponseDto> itemImages;

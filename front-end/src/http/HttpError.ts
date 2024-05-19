@@ -1,5 +1,3 @@
-import type { AxiosError } from "axios"
-
 export default class HttpError {
     
     private readonly code: string

@@ -9,6 +9,8 @@
     "node_modules/vuex/types/index.d.ts"
   ],
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "composite": true,
     "noEmit": false,
     "module": "ESNext",
