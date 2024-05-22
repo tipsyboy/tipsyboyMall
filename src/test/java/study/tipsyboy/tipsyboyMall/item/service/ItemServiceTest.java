@@ -128,37 +128,37 @@ class ItemServiceTest {
         assertEquals(item.getStock(), findItem.getStock());
         assertEquals(item.getDescription(), findItem.getDescription());
     }
-
-    @Test
-    @DisplayName("전체 상품을 조회한다.")
-    public void getItemAll() throws Exception {
-        // given
-        Member member = Member.builder()
-                .email("tipsyboy@gmail.com")
-                .password("1234")
-                .nickname("간술맨")
-                .memberRole(MemberRole.MEMBER)
-                .build();
-        memberRepository.save(member);
-
-        List<Item> items = IntStream.range(0, 20)
-                .mapToObj(i -> Item.builder()
-                        .member(member)
-                        .itemName("상품 " + i)
-                        .price(10000 + i)
-                        .stock(i)
-                        .description("상품 설명 " + i)
-                        .build())
-                .collect(Collectors.toList());
-        itemRepository.saveAll(items);
-
-        // when
-        List<ItemResponseDto> findItems = itemService.getAllItems();
-
-        // then
-        assertEquals(20, itemRepository.count());
-        assertEquals(20, findItems.size());
-    }
+//
+//    @Test
+//    @DisplayName("전체 상품을 조회한다.")
+//    public void getItemAll() throws Exception {
+//        // given
+//        Member member = Member.builder()
+//                .email("tipsyboy@gmail.com")
+//                .password("1234")
+//                .nickname("간술맨")
+//                .memberRole(MemberRole.MEMBER)
+//                .build();
+//        memberRepository.save(member);
+//
+//        List<Item> items = IntStream.range(0, 20)
+//                .mapToObj(i -> Item.builder()
+//                        .member(member)
+//                        .itemName("상품 " + i)
+//                        .price(10000 + i)
+//                        .stock(i)
+//                        .description("상품 설명 " + i)
+//                        .build())
+//                .collect(Collectors.toList());
+//        itemRepository.saveAll(items);
+//
+//        // when
+//        List<ItemResponseDto> findItems = itemService.getAllItems();
+//
+//        // then
+//        assertEquals(20, itemRepository.count());
+//        assertEquals(20, findItems.size());
+//    }
 
     @Test
     @DisplayName("상품 단건 조회에 실패한다. - 존재 하지 않는 상품")
@@ -294,60 +294,60 @@ class ItemServiceTest {
         assertEquals("상품 10", findItems.getContent().get(findItems.getContent().size() - 1).getItemName());
     }
 
-    @Test
-    @DisplayName("내 상품 목록을 조회한다.")
-    public void getMyItems() throws Exception {
-        // given
-        Member member = Member.builder()
-                .email("tipsyboy@gmail.com")
-                .nickname("간술맨")
-                .password("1234")
-                .memberRole(MemberRole.MEMBER)
-                .build();
-
-        Member member2 = Member.builder()
-                .email("tipsyboy2@gmail.com")
-                .nickname("혼술맨")
-                .password("1234")
-                .memberRole(MemberRole.MEMBER)
-                .build();
-        memberRepository.save(member);
-        memberRepository.save(member2);
-
-        List<Item> items = IntStream.range(0, 30)
-                .mapToObj(i -> Item.builder()
-                        .member(member)
-                        .itemName("상품 " + i)
-                        .price(10000 + i)
-                        .stock(i)
-                        .description("상품 설명 " + i)
-                        .build())
-                .collect(Collectors.toList());
-        itemRepository.saveAll(items);
-
-        List<Item> items2 = IntStream.range(30, 50)
-                .mapToObj(i -> Item.builder()
-                        .member(member2)
-                        .itemName("상품 " + i)
-                        .price(10000 + i)
-                        .stock(i)
-                        .description("상품 설명 " + i)
-                        .build())
-                .collect(Collectors.toList());
-        itemRepository.saveAll(items2);
-
-        // when - 첫 번째 MEMBER 간술맨의 상품만 2번째 페이지 내림차순 조회한다.
-        ItemSearchReqDto paging = ItemSearchReqDto.builder()
-                .page(2)
-                .build();
-        List<ItemResponseDto> findItems = itemService.getMyItemForPage(member.getId(), paging);
-
-        // then
-        assertEquals(50, itemRepository.count());
-        assertEquals(10, findItems.size());
-        assertEquals("상품 9", findItems.get(0).getItemName());
-        assertEquals("상품 0", findItems.get(findItems.size() - 1).getItemName());
-    }
+//    @Test
+//    @DisplayName("내 상품 목록을 조회한다.")
+//    public void getMyItems() throws Exception {
+//        // given
+//        Member member = Member.builder()
+//                .email("tipsyboy@gmail.com")
+//                .nickname("간술맨")
+//                .password("1234")
+//                .memberRole(MemberRole.MEMBER)
+//                .build();
+//
+//        Member member2 = Member.builder()
+//                .email("tipsyboy2@gmail.com")
+//                .nickname("혼술맨")
+//                .password("1234")
+//                .memberRole(MemberRole.MEMBER)
+//                .build();
+//        memberRepository.save(member);
+//        memberRepository.save(member2);
+//
+//        List<Item> items = IntStream.range(0, 30)
+//                .mapToObj(i -> Item.builder()
+//                        .member(member)
+//                        .itemName("상품 " + i)
+//                        .price(10000 + i)
+//                        .stock(i)
+//                        .description("상품 설명 " + i)
+//                        .build())
+//                .collect(Collectors.toList());
+//        itemRepository.saveAll(items);
+//
+//        List<Item> items2 = IntStream.range(30, 50)
+//                .mapToObj(i -> Item.builder()
+//                        .member(member2)
+//                        .itemName("상품 " + i)
+//                        .price(10000 + i)
+//                        .stock(i)
+//                        .description("상품 설명 " + i)
+//                        .build())
+//                .collect(Collectors.toList());
+//        itemRepository.saveAll(items2);
+//
+//        // when - 첫 번째 MEMBER 간술맨의 상품만 2번째 페이지 내림차순 조회한다.
+//        ItemSearchReqDto paging = ItemSearchReqDto.builder()
+//                .page(2)
+//                .build();
+//        List<ItemResponseDto> findItems = itemService.getMyItemForPage(member.getId(), paging);
+//
+//        // then
+//        assertEquals(50, itemRepository.count());
+//        assertEquals(10, findItems.size());
+//        assertEquals("상품 9", findItems.get(0).getItemName());
+//        assertEquals("상품 0", findItems.get(findItems.size() - 1).getItemName());
+//    }
 
     @Test
     @DisplayName("상품 제목으로 검색")

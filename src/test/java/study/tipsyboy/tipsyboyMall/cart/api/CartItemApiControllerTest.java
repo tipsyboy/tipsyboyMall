@@ -163,7 +163,7 @@ class CartItemApiControllerTest {
         cartItemRepository.save(cartItem);
 
         CartItemUpdateRequestDto requestDto = CartItemUpdateRequestDto.builder()
-                .itemId(item.getId())
+                .cartItemId(item.getId())
                 .count(1)
                 .build();
         String json = objectMapper.writeValueAsString(requestDto);

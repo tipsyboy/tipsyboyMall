@@ -202,7 +202,7 @@ class CartItemServiceTest {
 
         // when
         CartItemUpdateRequestDto requestDto = CartItemUpdateRequestDto.builder()
-                .itemId(item.getId())
+                .cartItemId(item.getId())
                 .count(2)
                 .build();
         cartItemService.editCartItemCount(buyer.getId(), cartItem.getId(), requestDto);
