@@ -5,20 +5,11 @@
 
       <el-table-column align="center">
         <template v-slot="{ row }">
-          <el-image
-            style="width: 80px; height: 80px"
-            :src="getImageUrl(row.itemThumnailImage)"
-            fit="cover"
-          />
+          <el-image style="width: 80px; height: 80px" :src="getImageUrl(row.itemThumnailImage)" fit="cover" />
         </template>
       </el-table-column>
 
-      <el-table-column
-        prop="itemName"
-        label="상품 이름"
-        align="center"
-        header-align="center"
-      ></el-table-column>
+      <el-table-column prop="itemName" label="상품 이름" align="center" header-align="center"></el-table-column>
 
       <el-table-column prop="count" label="수량" align="center" header-align="center">
         <template v-slot="{ row }">
@@ -31,22 +22,14 @@
               size="small"
               class="quantity-input"
             ></el-input-number>
-            <el-button
-              class="cartItem-update"
-              @click="updateCartItem(row.cartItemId, row.count)"
-              size="small"
+            <el-button class="cartItem-update" @click="updateCartItem(row.cartItemId, row.count)" size="small"
               >변경</el-button
             >
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column
-        prop="price"
-        label="가격"
-        align="center"
-        header-align="center"
-      ></el-table-column>
+      <el-table-column prop="price" label="가격" align="center" header-align="center"></el-table-column>
 
       <el-table-column prop="total" label="합계" align="center" header-align="center">
         <template v-slot="{ row }">
@@ -63,9 +46,7 @@
 
     <div>총 합계 가격: {{ getTotalPrice() }}</div>
 
-    <el-button class="cart-order-btn" @click="cartToOrder()" type="primary">
-      선택한 상품 주문
-    </el-button>
+    <el-button class="cart-order-btn" @click="cartToOrder()" type="primary"> 선택한 상품 주문 </el-button>
   </CenterLayout>
 </template>
 
@@ -99,11 +80,7 @@ const fetchData = async () => {
 
 const updateCartItem = async (cartItemId: number, newCount: number) => {
   await axios
-    .patch(
-      `${requestUrl}/api/cartItem/${cartItemId}`,
-      { cartItemId, count: newCount },
-      { withCredentials: true }
-    )
+    .patch(`${requestUrl}/api/cartItem/${cartItemId}`, { cartItemId, count: newCount }, { withCredentials: true })
     .then(() => {
       console.log('수정이 완료됨.')
     })
@@ -117,7 +94,7 @@ const deleteCartItem = async (cartItemId: number) => {
     type: 'warning',
     confirmButtonText: '삭제',
     cancelButtonText: '취소',
-    icon: markRaw(Delete)
+    icon: markRaw(Delete),
   })
     .then(async () => {
       await axios
@@ -125,7 +102,7 @@ const deleteCartItem = async (cartItemId: number) => {
         .then(() => {
           ElMessage({
             message: '삭제되었습니다.',
-            type: 'success'
+            type: 'success',
           })
           router.go(0)
           // window.location.reload()
@@ -152,7 +129,7 @@ const cartToOrder = async () => {
   ElMessageBox.confirm('선택한 상품들을 주문합니다. 결제창으로 이동합니다.', '주문', {
     type: 'success',
     confirmButtonText: '확인',
-    cancelButtonText: '취소'
+    cancelButtonText: '취소',
   }).then(() => {
     const serializedItems = selectedItems.value.map((item) => ({
       cartItemId: item.cartItemId,
@@ -160,22 +137,20 @@ const cartToOrder = async () => {
       itemThumnailImage: item.itemThumnailImage,
       price: item.price,
       count: item.count,
-      stock: item.stock
+      stock: item.stock,
     }))
     router.push({
       name: 'order',
       state: {
         tempData: { a: 1, b: 'string', c: true },
-        selectedItems: serializedItems
-      }
+        selectedItems: serializedItems,
+      },
     })
   })
 }
 
 const getImageUrl = (storedName: string) => {
-  return storedName
-    ? `http://localhost:8080/images/${storedName}`
-    : '@element-plus/theme-chalk/el-icon-picture'
+  return storedName ? `http://localhost:8080/images/${storedName}` : '@element-plus/theme-chalk/el-icon-picture'
 }
 
 const handleSelectionChange = (selectedRows: any) => {

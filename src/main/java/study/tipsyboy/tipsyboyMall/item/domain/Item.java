@@ -14,14 +14,17 @@ import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.likeitem.domain.LikeItem;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Item extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
     private Long id;
 
@@ -74,6 +77,17 @@ public class Item extends BaseTimeEntity {
         this.price = itemEditor.getPrice();
         this.stock = itemEditor.getStock();
         this.description = itemEditor.getDescription();
+    }
+
+    public void imageUpdate(List<String> storedImages) {
+        Iterator<ItemFile> iterator = itemImages.iterator();
+        while (iterator.hasNext()) {
+            ItemFile itemImage = iterator.next();
+            if (!storedImages.contains(itemImage.getStoredName())) {
+                iterator.remove();
+                itemImage.unMapping(this);
+            }
+        }
     }
 
     public Long getMemberId() {

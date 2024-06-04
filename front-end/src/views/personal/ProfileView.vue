@@ -23,7 +23,7 @@ const route = useRoute()
 onMounted(() => {
   axios
     .get(`http://localhost:8080/members/profile/${route.params.nickname}`, {
-      withCredentials: true
+      withCredentials: true,
     })
     .then((response) => {
       console.log(response.data)

@@ -29,4 +29,10 @@ public class ItemFile extends UploadFile {
         this.item = item;
         item.getItemImages().add(this);
     }
+
+    public void unMapping(Item item) {
+        this.item = null;
+        item.getItemImages().remove(this);
+    }
+
 }

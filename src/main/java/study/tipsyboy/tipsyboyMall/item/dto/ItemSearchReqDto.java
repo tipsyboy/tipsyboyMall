@@ -2,6 +2,8 @@ package study.tipsyboy.tipsyboyMall.item.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Builder
 @Getter
@@ -26,5 +28,9 @@ public class ItemSearchReqDto {
 
     public Integer getPage() {
         return Math.max(1, this.page);
+    }
+
+    public Pageable getPageable() {
+        return PageRequest.of(this.page - 1, this.size);
     }
 }

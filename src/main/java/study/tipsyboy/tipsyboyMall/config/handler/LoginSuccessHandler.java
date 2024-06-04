@@ -27,7 +27,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
 
         LoginMember principal = (LoginMember) authentication.getPrincipal();
-        log.info("[인증 성공] member={}", principal.getUsername());
+        log.info("[인증 성공] member e-mail={}", principal.getUsername());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

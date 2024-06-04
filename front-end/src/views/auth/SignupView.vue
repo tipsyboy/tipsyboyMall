@@ -35,7 +35,7 @@ import MemberRepository from '@/repository/MemberRepository'
 
 const router = useRouter()
 const state = reactive({
-  signupForm: new SignupForm()
+  signupForm: new SignupForm(),
 })
 const MEMBER_REPOSITORY = container.resolve(MemberRepository)
 
@@ -43,7 +43,7 @@ const signup = () => {
   MEMBER_REPOSITORY.signup(state.signupForm)
     .then(() => {
       ElMessage({ type: 'success', message: '환영합니다. :) 로그인 해주세요!' })
-      router.push("/login")
+      router.push('/login')
     })
     .catch((e: HttpError) => {
       ElMessage({ type: 'error', message: e.getMessage() })

@@ -64,13 +64,9 @@ const priceFormatter = (price: Number) => {
 }
 
 const handlePayment = () => {
-  ElMessageBox.confirm(
-    `최종 결제 금액 ${priceFormatter(getFinalPrice())}을 결제합니다.`,
-    '결제 확인',
-    {
-      type: 'warning'
-    }
-  )
+  ElMessageBox.confirm(`최종 결제 금액 ${priceFormatter(getFinalPrice())}을 결제합니다.`, '결제 확인', {
+    type: 'warning',
+  })
     .then(() => {
       ElMessage.success('호구 당첨')
     })

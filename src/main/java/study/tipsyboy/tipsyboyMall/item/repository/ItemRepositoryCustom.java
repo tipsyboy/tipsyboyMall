@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ItemRepositoryCustom {
 
-    Page<Item> getItems(ItemSearchReqDto pagingRequestDto, Pageable pageable);
+    Page<Item> getItems(ItemSearchReqDto pagingRequestDto);
 
     Page<Item> getMyItems(ItemSearchReqDto pagingRequestDto, Member member, Pageable pageable);
 }

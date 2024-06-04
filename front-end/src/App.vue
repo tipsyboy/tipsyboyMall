@@ -15,4 +15,8 @@ body {
   margin: 0;
   width: 100%;
 }
+
+.el-table .cell {
+  cursor: pointer;
+}
 </style>

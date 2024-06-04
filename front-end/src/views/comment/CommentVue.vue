@@ -15,7 +15,7 @@ import CommentCreate from './CommentCreate.vue'
 const comments = ref([
   { id: 1, author: 'User1', timestamp: '2024-04-03 00:11:00', content: 'This is a comment.' },
   { id: 2, author: 'User2', timestamp: '2022-03-29 10:05:00', content: 'This is another comment.' },
-  { id: 3, author: '간술맨', timestamp: '2024-03-29 10:05:00', content: 'seggs섹보' }
+  { id: 3, author: '간술맨', timestamp: '2024-03-29 10:05:00', content: 'seggs섹보' },
 ])
 </script>
 

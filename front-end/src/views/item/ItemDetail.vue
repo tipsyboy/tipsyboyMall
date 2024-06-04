@@ -1,10 +1,7 @@
 <template>
   <CenterLayout>
     <div class="item-images">
-      <el-empty
-        :image-size="150"
-        v-if="!state.item.itemImages || state.item.itemImages.length === 0"
-      />
+      <el-empty :image-size="150" v-if="!state.item.itemImages || state.item.itemImages.length === 0" />
       <el-carousel v-else indicator-position="outside" :pause-on-hover="true" height="430px">
         <el-carousel-item v-for="(itemImage, index) in state.item.itemImages" :key="index">
           <img class="item-image" :src="getImageByFileName(itemImage.storedName)" />
@@ -16,8 +13,8 @@
       <h1 class="item-name">{{ state.item.itemName }}</h1>
 
       <div class="item-btn">
-        <el-button type="primary" :icon="Edit" circle />
-        <el-button type="danger" :icon="Delete" circle />
+        <el-button type="primary" @click="toEditItem()" :icon="Edit" circle />
+        <el-button type="danger" @click="deleteItem()" :icon="Delete" circle />
       </div>
     </div>
 
@@ -37,9 +34,7 @@
         <el-descriptions :column="1">
           <el-descriptions-item label="상태">{{ state.item.status }}</el-descriptions-item>
           <el-descriptions-item label="수량"><el-input-number :min="1" /></el-descriptions-item>
-          <el-descriptions-item
-            ><el-button type="info" plain>카트에 담기</el-button></el-descriptions-item
-          >
+          <el-descriptions-item><el-button type="info" plain>카트에 담기</el-button></el-descriptions-item>
         </el-descriptions>
       </div>
     </div>
@@ -57,13 +52,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { markRaw, onMounted, reactive } from 'vue'
 import { container } from 'tsyringe'
 import ItemRepository from '@/repository/ItemRepository'
 import { Delete, Edit } from '@element-plus/icons-vue'
 import CommentVue from '../comment/CommentVue.vue'
 import Item from '@/entity/item/Item'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const ITEM_REPOSITORY = container.resolve(ItemRepository)
+const router = useRouter()
 const props = defineProps<{
   itemId: number
 }>()
@@ -73,10 +72,9 @@ type StateType = {
 }
 
 const state = reactive<StateType>({
-  item: new Item()
+  item: new Item(),
 })
 
-const ITEM_REPOSITORY = container.resolve(ItemRepository)
 onMounted(() => {
   getItem()
 })
@@ -91,7 +89,30 @@ const getItem = () => {
     })
 }
 
-const deleteItem = () => {}
+const toEditItem = () => {
+  router.push({ name: 'itemEdit' })
+}
+
+const deleteItem = () => {
+  ElMessageBox.confirm('정말로 삭제하시겠습니까?', '삭제', {
+    type: 'warning',
+    icon: markRaw(Delete),
+  })
+    .then(() => {
+      ITEM_REPOSITORY.deleteItem(props.itemId)
+        .then(() => {
+          ElMessage.success('삭제되었습니다.')
+          router.push('/')
+        })
+        .catch((e) => {
+          console.error(e)
+          ElMessage.error('삭제할 수 없습니다.')
+        })
+    })
+    .catch(() => {
+      console.log('삭제 - 취소함')
+    })
+}
 
 const getImageByFileName = (storedName: string) => {
   return `/api/images/${storedName}`

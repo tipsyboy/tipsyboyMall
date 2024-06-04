@@ -55,15 +55,15 @@ const dummyOrderData = [
     itemId: 101,
     itemName: '상품 1',
     price: 10000,
-    count: 2
+    count: 2,
   },
   {
     cartItemId: 2,
     itemId: 102,
     itemName: '상품 2',
     price: 20000,
-    count: 1
-  }
+    count: 1,
+  },
 ]
 </script>
 

@@ -1,95 +1,77 @@
 <template>
   <CenterLayout>
-    <el-table
-      :data="items"
-      @row-click="showItemDetail"
-      style="width: 100%"
-      :row-class-name="rowClassName"
-    >
-      <el-table-column prop="itemId" label="No" width="50" />
-      <el-table-column label="카테고리">카테고리</el-table-column>
-      <el-table-column prop="itemName" label="상품명" width="180"> </el-table-column>
-      <el-table-column prop="status" label="상태" width="180" />
-      <el-table-column prop="seller" label="작성자" width="180" />
-      <el-table-column :prop="'createdDate'" label="날짜">
+    <el-table :data="state.itemList.contents" @row-click="toItemDetail">
+      <el-table-column prop="itemId" label="No"></el-table-column>
+      <el-table-column prop="itemName" label="제목" style="cursor: pointer"></el-table-column>
+      <el-table-column prop="seller" label="작성자"></el-table-column>
+      <el-table-column label="작성일시">
         <template v-slot="{ row }">
-          {{ formatDateTime(row.createdDate) }}
+          {{ formatDateTime(row as Item) }}
         </template>
       </el-table-column>
-      <el-table-column prop="xxx" label="조회수" />
     </el-table>
-    <el-pagination
-      :hide-on-single-page="true"
-      class="paging-bar"
-      background
-      layout="prev, pager, next"
-      @current-change="handlePageChange"
-      :default-page-size="pageSize"
-      :total="totalCount"
-    />
+
+    <div class="paging-container">
+      <el-pagination
+        class="paging-bar"
+        :hide-on-single-page="true"
+        background
+        layout="prev, pager, next"
+        v-model:current-page="state.itemList.page"
+        :total="state.itemList.totalCount"
+        :default-page-size="10"
+        @current-change="(page: number) => getItemList(page)"
+      />
+    </div>
   </CenterLayout>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import moment from 'moment'
+<script setup lang="ts">
+import Paging from '@/entity/data/Paging'
+import Item from '@/entity/item/Item'
+import ItemRepository from '@/repository/ItemRepository'
+import { container } from 'tsyringe'
+import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
+const ITEM_REPOSITORY = container.resolve(ItemRepository)
 const router = useRouter()
-const requestUrl = 'http://localhost:8080/items'
-const items = ref([])
-const currentPage = ref(1)
-const pageSize = ref(12)
-const totalCount = ref(0)
-
-onMounted(async () => {
-  fetchData()
+type StateType = {
+  itemList: Paging<Item>
+}
+const state = reactive<StateType>({
+  itemList: new Paging<Item>(),
 })
 
-const fetchData = async () => {
-  const queryParams = {
-    page: currentPage.value,
-    size: pageSize.value
-  }
+onMounted(() => {
+  getItemList()
+})
 
-  await axios
-    .get(requestUrl, { params: queryParams })
-    .then((response) => {
-      console.log(response)
-      items.value = response.data.content
-      totalCount.value = response.data.totalElements
+const getItemList = (page = 1) => {
+  ITEM_REPOSITORY.getItemList(page)
+    .then((itemList) => {
+      state.itemList = itemList
     })
-    .catch((error) => {
-      console.log(error)
+    .catch((e) => {
+      console.error('Failed to get item list.', e)
     })
 }
 
-const handlePageChange = (page: number) => {
-  currentPage.value = page
-  fetchData()
+const toItemDetail = (item: Item) => {
+  router.push({ name: 'itemDetail', params: { itemId: item.itemId } })
 }
-
-const formatDateTime = (dateTime: any) => {
-  return moment(dateTime).format('YYYY-MM-DD HH:mm')
-}
-
-const showItemDetail = (row: any) => {
-  router.push({ name: 'itemDetail', params: { itemId: row.itemId } })
-}
-
-const rowClassName = (row: any, index: number) => {
-  return 'hovered-row'
+const formatDateTime = (item: Item) => {
+  return item.getFormattedDateTime()
 }
 </script>
 
 <style>
-.hovered-row {
-  cursor: pointer;
+.paging-container {
+  display: flex;
+  justify-content: center;
 }
 
 .paging-bar {
-  margin-top: 10px;
-  margin-left: 20%;
+  margin-top: 2rem;
 }
 </style>

@@ -16,13 +16,7 @@
 
     <!-- main page content -->
     <div class="main-rep-items">
-      <el-carousel
-        :interval="5000"
-        type="card"
-        height="380px"
-        indicator-position="outside"
-        :pause-on-hover="true"
-      >
+      <el-carousel :interval="5000" type="card" height="380px" indicator-position="outside" :pause-on-hover="true">
         <el-carousel-item v-for="(item, index) in items" :key="index">
           <div class="rep-items__content">
             <img class="rep-item__image" :src="item.image" alt="Product Image" />
@@ -49,64 +43,64 @@ const items = [
     name: 'Product 1',
     description: 'Description of Product 1',
     price: '$10.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 2,
     name: 'Product 2',
     description: 'Description of Product 2',
     price: '$20.49',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 3,
     name: 'Product 3',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 4,
     name: 'Product 4',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 5,
     name: 'Product 5',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 6,
     name: 'Product 6',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 7,
     name: 'Product 7',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 8,
     name: 'Product 8',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 9,
     name: 'Product 9',
     description: 'Description of Product 3',
     price: '$15.99',
-    image: 'https://via.placeholder.com/150'
-  }
+    image: 'https://via.placeholder.com/150',
+  },
 ]
 </script>
 

@@ -4,11 +4,7 @@
     <el-table :data="orderData" style="width: 100%">
       <el-table-column align="center">
         <template v-slot="{ row }">
-          <el-image
-            style="width: 80px; height: 80px"
-            :src="getImageUrl(row.itemThumnailImage)"
-            fit="cover"
-          />
+          <el-image style="width: 80px; height: 80px" :src="getImageUrl(row.itemThumnailImage)" fit="cover" />
         </template>
       </el-table-column>
       <el-table-column label="상품 정보" align="center">
@@ -34,9 +30,7 @@ const props = defineProps<{
 }>()
 
 const getImageUrl = (storedName: string) => {
-  return storedName
-    ? `http://localhost:8080/images/${storedName}`
-    : '@element-plus/theme-chalk/el-icon-picture'
+  return storedName ? `http://localhost:8080/images/${storedName}` : '@element-plus/theme-chalk/el-icon-picture'
 }
 
 const getTotalItemsCount = () => {

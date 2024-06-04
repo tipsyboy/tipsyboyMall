@@ -28,10 +28,7 @@
               <div class="input">
                 <div class="zipcode-input">
                   <el-input :value="deliveryInfo.zonecode" style="width: 25%" />
-                  <el-button
-                    type="primary"
-                    @click="postalCodeModalVisible()"
-                    style="margin-left: 10px"
+                  <el-button type="primary" @click="postalCodeModalVisible()" style="margin-left: 10px"
                     >주소 찾기</el-button
                   >
                 </div>
@@ -67,10 +64,7 @@
             <div class="input-row">
               <label class="label">전화 번호</label>
               <div class="input">
-                <el-input
-                  v-model="deliveryInfo.phoneNumber"
-                  placeholder="하이픈(-)을 빼고 번호만 입력해주세요"
-                />
+                <el-input v-model="deliveryInfo.phoneNumber" placeholder="하이픈(-)을 빼고 번호만 입력해주세요" />
               </div>
             </div>
           </li>
@@ -108,7 +102,7 @@ const deliveryInfo = ref({
   roadAddress: '경기 성남시 분당구 판교역로 166',
   jibunAddress: '경기 성남시 분당구 백현동 532',
   deliveryNote: '부재 시 경비실에 맡겨주세요.',
-  detailAddress: '102호'
+  detailAddress: '102호',
 })
 
 const modalVisible = ref(false) // 모달 창의 가시성을 관리하기 위한 ref 변수
@@ -148,7 +142,7 @@ const postalCodeModalVisible = () => {
         deliveryInfo.value.jibunAddress = jibunAddr
 
         modalVisible.value = false
-      }
+      },
     }).open()
   }
   document.head.appendChild(script)

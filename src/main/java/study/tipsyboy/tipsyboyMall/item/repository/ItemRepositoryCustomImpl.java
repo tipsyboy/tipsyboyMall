@@ -23,7 +23,7 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<Item> getItems(ItemSearchReqDto searchReqDto, Pageable pageable) {
+    public Page<Item> getItems(ItemSearchReqDto searchReqDto) {
         List<Item> contents = jpaQueryFactory.selectFrom(item)
                 .where(
                         titleLike(searchReqDto.getTitle()),
@@ -41,7 +41,7 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom {
                         sellerLike(searchReqDto.getSeller())
                 )
                 .fetchOne();
-        return new PageImpl<>(contents, pageable, total == null ? 0 : total);
+        return new PageImpl<>(contents, searchReqDto.getPageable(), total == null ? 0 : total);
     }
 
     @Override
