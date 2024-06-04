@@ -16,6 +16,7 @@ import study.tipsyboy.tipsyboyMall.item.dto.ItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.service.ItemService;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +43,7 @@ public class ItemApiController {
     }
 
     @GetMapping("/items")
-    public ResponseEntity<Page<ItemResponseDto>> getItems(@ModelAttribute ItemSearchReqDto pagingRequestDto) {
+    public ResponseEntity<PagingResponse<ItemResponseDto>> getItems(@ModelAttribute ItemSearchReqDto pagingRequestDto) {
         return ResponseEntity.ok(itemService.getItemsForPage(pagingRequestDto));
     }
 
@@ -54,12 +55,13 @@ public class ItemApiController {
         return ResponseEntity.ok(itemService.getMyItemForPage(loginMember.getMemberId(), pagingRequestDto));
     }
 
-    @PatchMapping("/items/{itemId}")
+    @PatchMapping(value = "/items/{itemId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_MEMBER') && hasPermission(#itemId, 'ITEM', 'PATCH'))")
     public ResponseEntity<Void> editItem(@PathVariable Long itemId,
-                                         @RequestBody ItemUpdateDto itemUpdateDto) {
+                                         @RequestPart(value = "itemUpdateDto") @Valid ItemUpdateDto itemUpdateDto,
+                                         @RequestPart(value = "newImageFiles", required = false) List<MultipartFile> newImageFiles) throws IOException {
 
-        itemService.edit(itemId, itemUpdateDto);
+        itemService.edit(itemId, itemUpdateDto, newImageFiles);
         return ResponseEntity.ok().build();
     }
 

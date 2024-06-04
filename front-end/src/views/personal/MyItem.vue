@@ -1,12 +1,7 @@
 <template>
   <CenterLayout>
     <ProfileMenu />
-    <el-table
-      :data="items"
-      @row-click="showItemDetail"
-      style="width: 100%"
-      :row-class-name="rowClassName"
-    >
+    <el-table :data="items" @row-click="showItemDetail" style="width: 100%" :row-class-name="rowClassName">
       <el-table-column prop="itemId" label="No" width="50" />
       <el-table-column label="카테고리">게시글 상태</el-table-column>
       <el-table-column prop="itemName" label="상품명" width="180"> </el-table-column>
@@ -50,7 +45,7 @@ onMounted(async () => {
 const fetchData = async () => {
   const queryParams = {
     page: currentPage.value,
-    size: pageSize.value
+    size: pageSize.value,
   }
   await axios
     .get(requestUrl, { params: queryParams, withCredentials: true })

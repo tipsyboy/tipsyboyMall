@@ -1,6 +1,7 @@
 export default class SignupForm {
+  public email = ''
 
-    public email = ""   
-    public password = ""
-    public nickname = ""
+  public password = ''
+
+  public nickname = ''
 }

@@ -21,87 +21,49 @@ import TempView from '@/components/TempView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // home
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
     },
+
     // auth
     {
       path: '/signup',
       name: 'signup',
-      component: SignupView
+      component: SignupView,
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
     },
-    
+
     // items
     {
       path: '/item/save',
       name: 'itemCreate',
-      component: ItemCreate
+      component: ItemCreate,
     },
-    // {
-    //   path: '/item/list',
-    //   name: 'itemList',
-    //   component: ItemList
-    // },
     {
       path: '/item/:itemId',
       name: 'itemDetail',
       component: ItemDetail,
-      props: true
+      props: true,
     },
-    // {
-    //   path: '/item/edit/:itemId',
-    //   name: 'itemEdit',
-    //   component: ItemEdit
-    // },
-
-    // // personal
-    // {
-    //   path: "/profile/:nickname",
-    //   name: "profile",
-    //   component: ProfileView
-    // },
-    // {
-    //   path: "/profile/:nickname/my-item",
-    //   name: "my-item",
-    //   component: MyItem
-    // },
-    // {
-    //   path: "/profile/:nickname/my-order",
-    //   name: "my-order",
-    //   component: MyOrder
-    // },
-    // {
-    //   path: '/cart',
-    //   name: 'cart',
-    //   component: CartView
-    // },
-
-    // // order
-    // {
-    //   path: '/order',
-    //   name: 'order',
-    //   component: OrderView
-    // },
-    // {
-    //   path: '/order/:orderId',
-    //   name: 'orderDetail',
-    //   component: OrderDetail
-    // },
-
-    // // temp
-    // {
-    //   path: '/temp',
-    //   name: 'temp',
-    //   component: TempView
-    // },
-  ]
+    {
+      path: '/item/edit/:itemId',
+      name: 'itemEdit',
+      component: ItemEdit,
+      props: true,
+    },
+    {
+      path: `/items`,
+      name: `itemList`,
+      component: ItemList,
+    },
+  ],
 })
 
 export default router

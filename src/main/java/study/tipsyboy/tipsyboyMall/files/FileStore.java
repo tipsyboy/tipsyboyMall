@@ -27,7 +27,6 @@ public class FileStore {
 
         File dir = absolutePath.getParent().toFile();
         if (!dir.exists()) {
-//            dir.mkdir();
             dir.mkdirs();
         }
 

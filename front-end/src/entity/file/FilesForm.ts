@@ -1,4 +1,3 @@
 export default class FilesForm {
-    
-    public imageFiles: File[] = []
+  public imageFiles: File[] = []
 }

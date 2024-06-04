@@ -23,6 +23,7 @@ import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -65,15 +66,19 @@ public class ItemService {
         return new ItemResponseDto(item);
     }
 
-    public Page<ItemResponseDto> getItemsForPage(ItemSearchReqDto requestDto) {
-        Page<Item> resultPage = itemRepository.getItems(requestDto, createPageable(requestDto));
 
-        List<ItemResponseDto> items = resultPage.getContent().stream()
-                .map(ItemResponseDto::new)
-                .collect(Collectors.toList());
+    public PagingResponse<ItemResponseDto> getItemsForPage(ItemSearchReqDto requestDto) {
+        Page<Item> resultPage = itemRepository.getItems(requestDto);
+        PagingResponse<ItemResponseDto> itemList = new PagingResponse<>(resultPage, ItemResponseDto.class);
 
-        return new PageImpl<>(items, resultPage.getPageable(), resultPage.getTotalElements());
+        return itemList;
+//        List<ItemResponseDto> items = resultPage.getContent().stream()
+//                .map(ItemResponseDto::new)
+//                .collect(Collectors.toList());
+
+//        return new PageImpl<>(items, resultPage.getPageable(), resultPage.getTotalElements());
     }
+
 
     public Page<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto requestDto) {
         Member member = memberRepository.findById(memberId)
@@ -89,7 +94,7 @@ public class ItemService {
     }
 
     @Transactional
-    public void edit(Long itemId, ItemUpdateDto itemUpdateDto) {
+    public void edit(Long itemId, ItemUpdateDto itemUpdateDto, List<MultipartFile> newImageFiles) throws IOException {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
@@ -101,6 +106,12 @@ public class ItemService {
                 .description(itemUpdateDto.getDescription())
                 .build();
 
+        if (itemUpdateDto.getStoredImages() != null) {
+            item.imageUpdate(itemUpdateDto.getStoredImages());
+        }
+        if (newImageFiles != null) {
+            saveItemImages(item, newImageFiles);
+        }
         item.update(itemEditor);
     }
 

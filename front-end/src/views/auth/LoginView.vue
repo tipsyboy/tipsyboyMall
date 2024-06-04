@@ -33,7 +33,7 @@ import MemberRepository from '@/repository/MemberRepository'
 
 const router = useRouter()
 const state = reactive({
-  loginForm: new LoginForm()
+  loginForm: new LoginForm(),
 })
 const MEMBER_REPOSITORY = container.resolve(MemberRepository)
 

@@ -10,7 +10,7 @@
       router
     >
       <el-menu-item index="/">Home</el-menu-item>
-      <el-menu-item index="/item/list">item list</el-menu-item>
+      <el-menu-item index="/items">item list</el-menu-item>
 
       <div class="flex-grow" />
       <el-menu-item index="/login">Login</el-menu-item>

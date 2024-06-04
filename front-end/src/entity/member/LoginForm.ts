@@ -1,5 +1,5 @@
 export default class LoginForm {
-    
-    public email = ""
-    public password = ""
+  public email = ''
+
+  public password = ''
 }
