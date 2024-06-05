@@ -45,7 +45,7 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom {
     }
 
     @Override
-    public Page<Item> getMyItems(ItemSearchReqDto searchReqDto, Member member, Pageable pageable) {
+    public Page<Item> getMyItems(ItemSearchReqDto searchReqDto, Member member) {
         List<Item> contents = jpaQueryFactory.selectFrom(item)
                 .where(
                         item.member.eq(member)
@@ -60,7 +60,7 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom {
                         item.member.eq(member)
                 )
                 .fetchOne();
-        return new PageImpl<>(contents, pageable, total == null ? 0 : total);
+        return new PageImpl<>(contents, searchReqDto.getPageable(), total == null ? 0 : total);
     }
 
     private BooleanExpression titleLike(String title) {

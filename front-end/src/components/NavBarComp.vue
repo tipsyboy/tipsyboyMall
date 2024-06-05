@@ -13,20 +13,51 @@
       <el-menu-item index="/items">item list</el-menu-item>
 
       <div class="flex-grow" />
-      <el-menu-item index="/login">Login</el-menu-item>
-      <el-menu-item index="/signup">Sign up</el-menu-item>
-      <el-sub-menu index="" class="mr-3">
-        <template #title>메뉴창 - 유저 닉네임</template>
-        <el-menu-item index="/profile"> 마이페이지 </el-menu-item>
+
+      <el-menu-item index="/login" v-if="state.profile === null">Login</el-menu-item>
+      <el-menu-item index="/signup" v-if="state.profile === null">Sign up</el-menu-item>
+
+      <el-sub-menu index="forLoginMember" class="mr-3" v-if="state.profile !== null">
+        <template #title>{{ state.profile.nickname }}</template>
+        <el-menu-item :index="'/profile/' + state.profile.nickname"> 마이페이지 </el-menu-item>
         <el-menu-item index="/cart">장바구니</el-menu-item>
         <el-menu-item index="/item/save">상품 등록</el-menu-item>
-        <el-menu-item>로그아웃</el-menu-item>
+        <el-menu-item @click="logout()">로그아웃</el-menu-item>
       </el-sub-menu>
     </el-menu>
   </el-header>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import type LoginMember from '@/entity/member/LoginMember'
+import MemberRepository from '@/repository/MemberRepository'
+import ProfileRepository from '@/repository/ProfileRepository'
+import { container } from 'tsyringe'
+import { onBeforeMount, reactive } from 'vue'
+
+const MEMBER_REPOSITORY = container.resolve(MemberRepository)
+const PROFILE_REPOSITORY = container.resolve(ProfileRepository)
+
+type StateType = {
+  profile: LoginMember | null
+}
+
+const state = reactive<StateType>({
+  profile: null,
+})
+
+onBeforeMount(() => {
+  MEMBER_REPOSITORY.getProfileByAuth().then((profile) => {
+    PROFILE_REPOSITORY.setProfile(profile)
+    state.profile = profile
+  })
+})
+
+const logout = () => {
+  PROFILE_REPOSITORY.clearProfile()
+  location.href = '/api/logout'
+}
+</script>
 
 <style scoped>
 .navbar {

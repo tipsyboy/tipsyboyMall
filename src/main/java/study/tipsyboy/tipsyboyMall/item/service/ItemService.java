@@ -69,28 +69,20 @@ public class ItemService {
 
     public PagingResponse<ItemResponseDto> getItemsForPage(ItemSearchReqDto requestDto) {
         Page<Item> resultPage = itemRepository.getItems(requestDto);
+
         PagingResponse<ItemResponseDto> itemList = new PagingResponse<>(resultPage, ItemResponseDto.class);
 
         return itemList;
-//        List<ItemResponseDto> items = resultPage.getContent().stream()
-//                .map(ItemResponseDto::new)
-//                .collect(Collectors.toList());
-
-//        return new PageImpl<>(items, resultPage.getPageable(), resultPage.getTotalElements());
     }
 
 
-    public Page<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto requestDto) {
+    public PagingResponse<ItemResponseDto> getMyItemForPage(Long memberId, ItemSearchReqDto requestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
-        Page<Item> resultPage = itemRepository.getMyItems(requestDto, member, createPageable(requestDto));
+        Page<Item> myItemsPage = itemRepository.getMyItems(requestDto, member);
 
-        List<ItemResponseDto> myItems = resultPage.stream()
-                .map(ItemResponseDto::new)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(myItems, resultPage.getPageable(), resultPage.getTotalElements());
+        return new PagingResponse<>(myItemsPage, ItemResponseDto.class);
     }
 
     @Transactional

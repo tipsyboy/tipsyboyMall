@@ -15,6 +15,6 @@
     "noEmit": false,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["node", "vuex"]
+    "types": ["node"]
   }
 }

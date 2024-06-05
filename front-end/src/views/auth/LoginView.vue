@@ -40,9 +40,8 @@ const MEMBER_REPOSITORY = container.resolve(MemberRepository)
 const login = () => {
   MEMBER_REPOSITORY.login(state.loginForm)
     .then(() => {
-      // todo: login message
       ElMessage({ type: 'success', message: '환영합니다. :)' })
-      router.replace('/')
+      location.href = '/'
     })
     .catch((e: HttpError) => {
       ElMessage({ type: 'error', message: e.getMessage() })
@@ -51,4 +50,3 @@ const login = () => {
 </script>
 
 <style scoped></style>
-@/repository/MemberRepository

@@ -16,11 +16,9 @@ export default class HttpRepository {
 
   public async getList<T>(config: HttpRequestConfig, clazz: { new (...args: any[]) }): Promise<Paging<T>> {
     return this.httpClient.request({ ...config, method: 'GET' }).then((response) => {
-      console.log('>>>>', response)
       const paging = plainToInstance<Paging<T>, any>(Paging, response)
       const contents = plainToInstance(clazz, response.contents)
       paging.setContents(contents)
-      console.log('>>>>', response)
       return paging
     })
   }

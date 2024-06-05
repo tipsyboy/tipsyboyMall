@@ -4,8 +4,8 @@ export default class HttpError {
   private readonly message: string
 
   constructor(e: any) {
-    console.log(e)
-    this.code = e.response?.data.code ?? '500'
+    // console.log(e)
+    this.code = e.response?.data.statusCode ?? '500'
     this.message = e.response?.data.message ?? '네트워크 상태가 좋지 않습니다. :('
   }
 

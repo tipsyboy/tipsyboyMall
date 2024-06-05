@@ -14,7 +14,7 @@ export type HttpRequestConfig = {
 export default class AxiosHttpClient {
   private readonly client: AxiosInstance = axios.create({
     timeout: 3000,
-    timeoutErrorMessage: 'timeout... 왜 안됨..?'
+    timeoutErrorMessage: 'timeout... 왜 안됨..?',
   })
 
   public async request(config: HttpRequestConfig) {
@@ -24,13 +24,12 @@ export default class AxiosHttpClient {
         method: config.method,
         url: config.path,
         params: config.params,
-        data: config.body
+        data: config.body,
       })
       .then((response: AxiosResponse) => {
         return response.data
       })
       .catch((e: AxiosError) => {
-        // const errorMessage = e.response?.data.message ?? e.message
         return Promise.reject(new HttpError(e))
       })
   }

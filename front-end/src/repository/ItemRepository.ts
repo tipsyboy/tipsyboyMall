@@ -80,4 +80,13 @@ export default class ItemRepository {
   public deleteItem(itemId: number) {
     return this.httpRepository.delete({ path: `/api/items/${itemId}` })
   }
+
+  public getMyItems(page: number): Promise<Paging<Item>> {
+    return this.httpRepository.getList(
+      {
+        path: `/api/items/my-items?page=${page}&size=5`,
+      },
+      Item,
+    )
+  }
 }

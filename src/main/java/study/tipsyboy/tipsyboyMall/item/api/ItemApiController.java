@@ -48,7 +48,7 @@ public class ItemApiController {
     }
 
     @GetMapping("/items/my-items")
-    public ResponseEntity<Page<ItemResponseDto>> getMyItems(
+    public ResponseEntity<PagingResponse<ItemResponseDto>> getMyItems(
             @ModelAttribute ItemSearchReqDto pagingRequestDto,
             @AuthenticationPrincipal LoginMember loginMember) {
 
