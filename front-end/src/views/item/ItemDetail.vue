@@ -60,6 +60,7 @@ import CommentVue from '../comment/CommentVue.vue'
 import Item from '@/entity/item/Item'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
+import ItemEdit from './ItemEdit.vue'
 
 const ITEM_REPOSITORY = container.resolve(ItemRepository)
 const router = useRouter()
@@ -102,7 +103,7 @@ const deleteItem = () => {
       ITEM_REPOSITORY.deleteItem(props.itemId)
         .then(() => {
           ElMessage.success('삭제되었습니다.')
-          router.push('/')
+          router.push('/items')
         })
         .catch((e) => {
           console.error(e)

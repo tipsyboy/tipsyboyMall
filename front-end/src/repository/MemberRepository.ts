@@ -2,6 +2,7 @@ import { singleton, inject } from 'tsyringe'
 import HttpRepository from '@/repository/HttpRepository'
 import type SignupForm from '@/entity/member/SignupForm'
 import type LoginForm from '@/entity/member/LoginForm'
+import LoginMember from '@/entity/member/LoginMember'
 
 @singleton()
 export default class MemberRepository {
@@ -19,5 +20,23 @@ export default class MemberRepository {
       path: '/api/auth/login',
       body: request,
     })
+  }
+
+  public getProfileByAuth() {
+    return this.httpRepository.get<LoginMember>(
+      {
+        path: `/api/members/me`,
+      },
+      LoginMember,
+    )
+  }
+
+  public getProfileByNickname(nickname: string) {
+    return this.httpRepository.get<LoginMember>(
+      {
+        path: `/api/members/profile/${nickname}`,
+      },
+      LoginMember,
+    )
   }
 }
