@@ -6,11 +6,14 @@
           <span class="price-span-label">상품 금액</span>
           <span class="total-price-span">{{ priceFormatter(getTotalPrice()) }}</span>
         </li>
+
         <li>
           <span class="price-span-label">배송비</span>
           <span class="total-price-span">{{ priceFormatter(getDeliveryPrice()) }}</span>
         </li>
+
         <el-divider />
+
         <li>
           <strong class="price-span-label">최종 결제 금액</strong>
           <strong class="total-price-span" style="color: red; font-size: 20px">
@@ -28,15 +31,28 @@
 </template>
 
 <script setup lang="ts">
+import type CartItem from '@/entity/cart/CartItem'
+import OrderCreateForm from '@/entity/order/OrderCreateForm'
+import OrderRepository from '@/repository/OrderRepository'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { container } from 'tsyringe'
+import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+
+const ORDER_REPOSITORY = container.resolve(OrderRepository)
+const router = useRouter()
 
 const props = defineProps<{
-  orderData: any
+  selectedItems: CartItem[]
 }>()
+
+const state = reactive({
+  orderCreateForm: new OrderCreateForm(),
+})
 
 const getTotalPrice = () => {
   let totalPrice = 0
-  for (const item of props.orderData) {
+  for (const item of props.selectedItems) {
     totalPrice += item.price * item.count
   }
   return totalPrice
@@ -48,7 +64,7 @@ const getDeliveryPrice = () => {
   if (totalPrice >= 50000) {
     return 0
   }
-  return 3000
+  return 3000 // 배송비...?
 }
 
 const getDiscount = () => {
@@ -68,7 +84,19 @@ const handlePayment = () => {
     type: 'warning',
   })
     .then(() => {
-      ElMessage.success('호구 당첨')
+      props.selectedItems.forEach((item) => {
+        state.orderCreateForm.cartItemIds.push(item.cartItemId)
+      })
+      ORDER_REPOSITORY.createOrder(state.orderCreateForm)
+        .then((orderId: number) => {
+          router.push({
+            name: 'orderDetail',
+            params: { orderId: orderId },
+          })
+        })
+        .catch((e) => {
+          console.error(e)
+        })
     })
     .catch(() => {
       console.log('실패')

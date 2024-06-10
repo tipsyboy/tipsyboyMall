@@ -1,6 +1,7 @@
 package study.tipsyboy.tipsyboyMall.cart.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
@@ -8,15 +9,13 @@ import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
-import study.tipsyboy.tipsyboyMall.cart.dto.CartItemIdsDto;
-import study.tipsyboy.tipsyboyMall.cart.dto.CartItemResponseDto;
-import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSaveRequestDto;
-import study.tipsyboy.tipsyboyMall.cart.dto.CartItemUpdateRequestDto;
+import study.tipsyboy.tipsyboyMall.cart.dto.*;
 import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,10 +55,13 @@ public class CartItemService {
         return cartItemRepository.save(cartItem).getId();
     }
 
-    public List<CartItemResponseDto> readCartItems(Long memberId) {
-        return cartItemRepository.findByMemberId(memberId).stream()
-                .map(CartItemResponseDto::new)
-                .collect(Collectors.toList());
+    public PagingResponse<CartItemResponseDto> readCartItems(Long memberId, CartItemSearchReqDto requestDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
+        Page<CartItem> cartItemList = cartItemRepository.getCartItemList(requestDto, member);
+
+        return new PagingResponse<>(cartItemList, CartItemResponseDto.class);
     }
 
     public List<CartItemResponseDto> readCartItemsByIds(List<Long> cartItemIds) {

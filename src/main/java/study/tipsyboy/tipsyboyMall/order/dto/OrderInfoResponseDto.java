@@ -27,7 +27,7 @@ public class OrderInfoResponseDto {
         this.orderStatus = entity.getOrderStatus();
         this.orderedDate = entity.getCreateDate();
         this.orderItemList = entity.getOrderItems().stream()
-                .map(orderItem -> OrderItemResponseDto.of(orderItem))
+                .map(OrderItemResponseDto::of)
                 .collect(Collectors.toList());
     }
 }

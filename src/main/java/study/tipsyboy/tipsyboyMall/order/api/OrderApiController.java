@@ -13,6 +13,7 @@ import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderPreviewItemResponseDto;
 import study.tipsyboy.tipsyboyMall.order.service.OrderService;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class OrderApiController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
-    public ResponseEntity<OrderInfoResponseDto> createOrder(@AuthenticationPrincipal LoginMember loginMember,
+    public ResponseEntity<Long> createOrder(@AuthenticationPrincipal LoginMember loginMember,
                                                             @RequestBody OrderByCartCreateDto orderByCartCreateDto) {
         return ResponseEntity.ok(orderService.order(loginMember.getMemberId(), orderByCartCreateDto));
     }
@@ -39,9 +40,8 @@ public class OrderApiController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_MEMBER')")
-    public ResponseEntity<List<OrderInfoResponseDto>> getOrderListByMemberId(
-            @ModelAttribute OrderPagingRequestDto requestDto,
-            @AuthenticationPrincipal LoginMember loginMember) {
+    public ResponseEntity<PagingResponse<OrderInfoResponseDto>> getOrderListByMemberId(@ModelAttribute OrderPagingRequestDto requestDto,
+                                                                                       @AuthenticationPrincipal LoginMember loginMember) {
 
         return ResponseEntity.ok(orderService.findOrderListByMemberId(requestDto, loginMember.getMemberId()));
     }
@@ -53,9 +53,4 @@ public class OrderApiController {
         return ResponseEntity.ok().build();
     }
 
-    // order preview
-    @PostMapping("/preview")
-    public ResponseEntity<List<OrderPreviewItemResponseDto>> viewOrderPreview(@RequestBody List<Long> selectedItems) {
-        return ResponseEntity.ok(orderService.preview(selectedItems));
-    }
 }

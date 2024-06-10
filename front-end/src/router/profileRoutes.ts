@@ -1,3 +1,4 @@
+import CartView from '@/views/profile/CartView.vue'
 import MyItem from '@/views/profile/MyItem.vue'
 import MyOrder from '@/views/profile/MyOrder.vue'
 import ProfileView from '@/views/profile/ProfileView.vue'
@@ -20,5 +21,10 @@ export default [
     name: 'myOrders',
     component: MyOrder,
     props: true,
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: CartView,
   },
 ]

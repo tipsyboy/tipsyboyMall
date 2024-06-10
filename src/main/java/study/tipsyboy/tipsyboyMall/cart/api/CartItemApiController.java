@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemResponseDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSaveRequestDto;
+import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemUpdateRequestDto;
 import study.tipsyboy.tipsyboyMall.cart.service.CartItemService;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/api/cartItem")
+@RequestMapping("/cartItem")
 @RequiredArgsConstructor
 @RestController
 public class CartItemApiController {
@@ -31,14 +33,15 @@ public class CartItemApiController {
 
     @GetMapping("/byIds")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
-    public ResponseEntity<List<CartItemResponseDto>> getCartItemsById(@RequestParam("ids") List<Long> cartItemIds) {
-        return ResponseEntity.ok(cartItemService.readCartItemsByIds(cartItemIds));
+    public ResponseEntity<List<CartItemResponseDto>> getCartItemsById(@RequestParam("ids") List<Long> ids) {
+        return ResponseEntity.ok(cartItemService.readCartItemsByIds(ids));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
-    public ResponseEntity<List<CartItemResponseDto>> getCartItems(@AuthenticationPrincipal LoginMember loginMember) {
-        return ResponseEntity.ok(cartItemService.readCartItems(loginMember.getMemberId()));
+    public ResponseEntity<PagingResponse<CartItemResponseDto>> getCartItems(@AuthenticationPrincipal LoginMember loginMember,
+                                                                            CartItemSearchReqDto requestDto) {
+        return ResponseEntity.ok(cartItemService.readCartItems(loginMember.getMemberId(), requestDto));
     }
 
     @PatchMapping("/{cartItemId}")

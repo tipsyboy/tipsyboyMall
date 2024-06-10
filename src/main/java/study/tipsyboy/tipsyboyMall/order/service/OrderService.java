@@ -3,6 +3,7 @@ package study.tipsyboy.tipsyboyMall.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import study.tipsyboy.tipsyboyMall.order.dto.OrderByCartCreateDto;
 import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderException;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderExceptionType;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,7 +42,7 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
 
     @Transactional
-    public OrderInfoResponseDto order(Long memberId, OrderByCartCreateDto orderByCartCreateDto) {
+    public Long order(Long memberId, OrderByCartCreateDto orderByCartCreateDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
@@ -54,9 +56,8 @@ public class OrderService {
                 .orderItems(orderItems)
                 .orderStatus(OrderStatus.ORDER)
                 .build();
-        orderRepository.save(order);
 
-        return new OrderInfoResponseDto(order);
+        return orderRepository.save(order).getId();
     }
 
     public OrderInfoResponseDto findOrderById(Long orderId) {
@@ -74,14 +75,13 @@ public class OrderService {
         order.cancel();
     }
 
-    public List<OrderInfoResponseDto> findOrderListByMemberId(
-            OrderPagingRequestDto pagingRequestDto, Long memberId) {
+    public PagingResponse<OrderInfoResponseDto> findOrderListByMemberId(OrderPagingRequestDto pagingRequestDto, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
-        return orderRepository.getOrderListByMemberId(pagingRequestDto, member).stream()
-                .map(OrderInfoResponseDto::new)
-                .collect(Collectors.toList());
+        Page<Order> myOrderList = orderRepository.getOrderListByMemberId(pagingRequestDto, member);
+
+        return new PagingResponse<>(myOrderList, OrderInfoResponseDto.class);
     }
 
     public List<OrderPreviewItemResponseDto> preview(List<Long> selectedCartItems) {

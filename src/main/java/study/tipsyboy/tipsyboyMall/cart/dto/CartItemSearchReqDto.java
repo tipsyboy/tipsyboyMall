@@ -1,13 +1,14 @@
-package study.tipsyboy.tipsyboyMall.order.dto;
+package study.tipsyboy.tipsyboyMall.cart.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@Getter
+
 @Builder
-public class OrderPagingRequestDto {
+@Getter
+public class CartItemSearchReqDto {
 
     private static final int MAX_SIZE = 2000;
 
@@ -16,6 +17,10 @@ public class OrderPagingRequestDto {
 
     @Builder.Default
     private Integer size = 20;
+
+    // 검색 조건
+    private String title;
+    private String seller;
 
     public Long getOffset() {
         return (long) (Math.max(1, this.page) - 1) * Math.min(this.size, MAX_SIZE);
