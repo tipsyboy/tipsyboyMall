@@ -4,7 +4,7 @@ import authRoutes from './authRoutes'
 import itemRoutes from './itemRoutes'
 import profileRoutes from './profileRoutes'
 import utilRoutes from './utilRoutes'
-import ErrorPage from '@/components/ErrorPage.vue'
+import orderRoutes from './orderRoutes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +17,7 @@ const router = createRouter({
 
     ...authRoutes,
     ...itemRoutes,
+    ...orderRoutes,
     ...profileRoutes,
     ...utilRoutes,
   ],

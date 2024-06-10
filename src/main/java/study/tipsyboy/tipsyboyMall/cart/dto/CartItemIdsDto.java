@@ -1,5 +1,6 @@
 package study.tipsyboy.tipsyboyMall.cart.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -9,6 +10,7 @@ public class CartItemIdsDto {
 
     private List<Long> ids;
 
+    @Builder
     public CartItemIdsDto(List<Long> ids) {
         this.ids = ids;
     }

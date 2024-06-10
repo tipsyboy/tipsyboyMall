@@ -60,6 +60,7 @@ const getMyItems = (page = 1) => {
   ITEM_REPOSITORY.getMyItems(page)
     .then((itemList) => {
       state.itemList = itemList
+      console.log(state.itemList)
     })
     .catch((e) => {
       console.error('Failed to get item list.', e)

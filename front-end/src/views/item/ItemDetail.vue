@@ -33,8 +33,12 @@
       <div class="item-info-right">
         <el-descriptions :column="1">
           <el-descriptions-item label="상태">{{ state.item.status }}</el-descriptions-item>
-          <el-descriptions-item label="수량"><el-input-number :min="1" /></el-descriptions-item>
-          <el-descriptions-item><el-button type="info" plain>카트에 담기</el-button></el-descriptions-item>
+          <el-descriptions-item label="수량">
+            <el-input-number v-model="state.cartItemCreateForm.count" :min="1" />
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <el-button type="info" @click="addToCart(state.item.itemId)" plain>카트에 담기</el-button>
+          </el-descriptions-item>
         </el-descriptions>
       </div>
     </div>
@@ -55,14 +59,16 @@
 import { markRaw, onMounted, reactive } from 'vue'
 import { container } from 'tsyringe'
 import ItemRepository from '@/repository/ItemRepository'
-import { Delete, Edit } from '@element-plus/icons-vue'
+import { Delete, Edit, Check } from '@element-plus/icons-vue'
 import CommentVue from '../comment/CommentVue.vue'
 import Item from '@/entity/item/Item'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
-import ItemEdit from './ItemEdit.vue'
+import CartItemCreateForm from '@/entity/cart/CartItemCreateForm'
+import CartRepository from '@/repository/CartRepository'
 
 const ITEM_REPOSITORY = container.resolve(ItemRepository)
+const CART_REPOSITORY = container.resolve(CartRepository)
 const router = useRouter()
 const props = defineProps<{
   itemId: number
@@ -70,10 +76,12 @@ const props = defineProps<{
 
 type StateType = {
   item: Item
+  cartItemCreateForm: CartItemCreateForm
 }
 
 const state = reactive<StateType>({
   item: new Item(),
+  cartItemCreateForm: new CartItemCreateForm(),
 })
 
 onMounted(() => {
@@ -83,7 +91,9 @@ onMounted(() => {
 const getItem = () => {
   ITEM_REPOSITORY.getItem(props.itemId)
     .then((item: Item) => {
+      console.log(item)
       state.item = item
+      console.log(state.item)
     })
     .catch((e) => {
       console.error(e)
@@ -112,6 +122,34 @@ const deleteItem = () => {
     })
     .catch(() => {
       console.log('삭제 - 취소함')
+    })
+}
+
+const addToCart = (itemId: number) => {
+  ElMessageBox.confirm('상품을 장바구니에 추가하시겠습니까?', '상품 추가', {
+    type: 'success',
+    icon: markRaw(Check),
+  })
+    .then((cartItemId) => {
+      state.cartItemCreateForm.setItemId(itemId)
+
+      CART_REPOSITORY.addToCart(state.cartItemCreateForm)
+        .then((cartItemId) => {
+          ElMessageBox.confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?', '장바구니', {
+            type: 'success',
+            icon: markRaw(Check),
+          })
+            .then(() => {
+              router.push('/cart')
+            })
+            .catch(() => {})
+        })
+        .catch((e) => {
+          console.error('>>>> 에러임.', e)
+        })
+    })
+    .catch(() => {
+      console.log('장바구니 등록 취소.')
     })
 }
 

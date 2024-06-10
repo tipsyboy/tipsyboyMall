@@ -40,7 +40,7 @@ export default class Item {
       const days = Math.floor(diff / 86400)
       return `${days}일 전`
     } else {
-      return this.createdDate.format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))
+      return this.createdDate.format(DateTimeFormatter.ofPattern('yyyy.MM.dd'))
     }
   }
 }

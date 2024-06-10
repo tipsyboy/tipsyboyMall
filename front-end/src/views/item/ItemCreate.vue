@@ -81,15 +81,6 @@ const createItem = () => {
       ElMessage.error(e.getMessage())
     })
 }
-
-// const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-//   console.log(uploadFile, uploadFiles)
-// }
-
-// const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
-//   dialogImageUrl.value = uploadFile.url!
-//   dialogVisible.value = true
-// }
 </script>
 
 <style scoped></style>

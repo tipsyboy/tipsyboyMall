@@ -11,7 +11,7 @@ public class CartItemResponseDto {
 
     private String itemName;
 
-    private String itemThumnailImage;
+    private String itemThumbnailImage;
 
     private Integer price;
 
@@ -24,7 +24,8 @@ public class CartItemResponseDto {
         this.cartItemId = entity.getId();
         this.itemId = entity.getItem().getId();
         this.itemName = entity.getItem().getItemName();
-        this.itemThumnailImage = entity.getItem().getItemImages().get(0).getStoredName();
+        this.itemThumbnailImage
+                = entity.getItem().getItemImages().isEmpty() ? null : entity.getItem().getItemImages().get(0).getStoredName();
         this.price = entity.getItem().getPrice();
         this.count = entity.getCount();
         this.stock = entity.getItem().getStock();

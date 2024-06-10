@@ -10,7 +10,7 @@ import type Paging from '@/entity/data/Paging'
 export default class ItemRepository {
   constructor(@inject(HttpRepository) private readonly httpRepository: HttpRepository) {}
 
-  public createItem(request: ItemCreateForm, images: FilesForm) {
+  public createItem(request: ItemCreateForm, images: FilesForm): Promise<number> {
     const formData = new FormData()
     formData.append('itemCreateDto', new Blob([JSON.stringify(request)], { type: 'application/json' }))
 

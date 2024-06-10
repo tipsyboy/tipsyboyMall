@@ -1,17 +1,17 @@
 <template>
   <CenterLayout>
-    <el-table :data="cartItems" @selection-change="handleSelectionChange" style="width: 100%">
+    <el-table :data="state.cartItemList.contents" @selection-change="handleSelectionChange">
       <el-table-column type="selection"></el-table-column>
+      <el-table-column prop="itemId" label="No" width="80"></el-table-column>
 
-      <el-table-column align="center">
+      <el-table-column>
         <template v-slot="{ row }">
-          <el-image style="width: 80px; height: 80px" :src="getImageUrl(row.itemThumnailImage)" fit="cover" />
+          <el-image style="width: 80px; height: 80px" :src="getImageUrl(row.itemThumbnailImage)" fit="cover" />
         </template>
       </el-table-column>
 
-      <el-table-column prop="itemName" label="상품 이름" align="center" header-align="center"></el-table-column>
-
-      <el-table-column prop="count" label="수량" align="center" header-align="center">
+      <el-table-column prop="itemName" label="상품명"></el-table-column>
+      <el-table-column prop="count" label="수량" header-align="center">
         <template v-slot="{ row }">
           <div class="quantity-container">
             <el-input-number
@@ -21,21 +21,21 @@
               controls-position="right"
               size="small"
               class="quantity-input"
-            ></el-input-number>
-            <el-button class="cartItem-update" @click="updateCartItem(row.cartItemId, row.count)" size="small"
-              >변경</el-button
-            >
+            />
+            <el-button class="cartItem-update" @click="editCartItemCount(row.cartItemId, row.count)" size="small">
+              변경
+            </el-button>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column prop="price" label="가격" align="center" header-align="center"></el-table-column>
+      <el-table-column prop="price" label="가격"></el-table-column>
 
-      <el-table-column prop="total" label="합계" align="center" header-align="center">
+      <el-table-column prop="total" label="합계" header-align="center">
         <template v-slot="{ row }">
           {{ row.price * row.count }}
-        </template></el-table-column
-      >
+        </template>
+      </el-table-column>
 
       <el-table-column>
         <template v-slot="{ row }">
@@ -44,71 +44,80 @@
       </el-table-column>
     </el-table>
 
-    <div>총 합계 가격: {{ getTotalPrice() }}</div>
-
-    <el-button class="cart-order-btn" @click="cartToOrder()" type="primary"> 선택한 상품 주문 </el-button>
+    <div class="cartView-footer">
+      <div>선택한 상품 가격: {{ calSelectedCartItemsPrice() }}</div>
+      <el-button @click="goToOrderPreview" type="primary"> 선택한 상품 주문 </el-button>
+    </div>
   </CenterLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
+import CartItem from '@/entity/cart/CartItem'
+import CartItemEditForm from '@/entity/cart/CartItemEditForm'
+import Paging from '@/entity/data/Paging'
+import CartRepository from '@/repository/CartRepository'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { markRaw } from 'vue'
+import { container } from 'tsyringe'
+import { markRaw, onMounted, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { Delete } from '@element-plus/icons-vue'
 
+const CART_REPOSITORY = container.resolve(CartRepository)
 const router = useRouter()
-const cartItems = ref([])
-const selectedItems = ref<any[]>([])
-const requestUrl = 'http://localhost:8080/api/cartItem'
 
-onMounted(async () => {
-  fetchData()
+type StateType = {
+  cartItemList: Paging<CartItem>
+  cartItemEditForm: CartItemEditForm
+  selectedCartItem: CartItem[]
+}
+
+const state = reactive<StateType>({
+  cartItemList: new Paging<CartItem>(),
+  cartItemEditForm: new CartItemEditForm(),
+  selectedCartItem: [],
 })
 
-const fetchData = async () => {
-  await axios
-    .get(requestUrl, { withCredentials: true })
-    .then((response) => {
-      cartItems.value = response.data
+onMounted(() => {
+  getCartItemList()
+})
+
+const getCartItemList = (page = 1) => {
+  CART_REPOSITORY.getCartItemList(page)
+    .then((cartItemList) => {
+      state.cartItemList = cartItemList
     })
-    .catch((error) => {
-      console.log(error)
+    .catch((e) => {
+      console.error('>>>>', e)
     })
 }
 
-const updateCartItem = async (cartItemId: number, newCount: number) => {
-  await axios
-    .patch(`${requestUrl}/api/cartItem/${cartItemId}`, { cartItemId, count: newCount }, { withCredentials: true })
+const editCartItemCount = (cartItemId: number, count: number) => {
+  state.cartItemEditForm.setCartItemId(cartItemId)
+  state.cartItemEditForm.setCount(count)
+  CART_REPOSITORY.editCartItemCount(state.cartItemEditForm, cartItemId)
     .then(() => {
-      console.log('수정이 완료됨.')
+      ElMessage.success('수량이 변경되었습니다.')
+      router.go(0)
     })
-    .catch((error) => {
-      console.error(error)
+    .catch((e) => {
+      ElMessage.error('에러')
+      console.error('>>>>', e)
     })
 }
 
-const deleteCartItem = async (cartItemId: number) => {
+const deleteCartItem = (cartItemId: number) => {
   ElMessageBox.confirm('정말로 삭제하시겠습니까?', '삭제', {
     type: 'warning',
-    confirmButtonText: '삭제',
-    cancelButtonText: '취소',
     icon: markRaw(Delete),
   })
-    .then(async () => {
-      await axios
-        .delete(`${requestUrl}/api/cartItem/${cartItemId}`, { withCredentials: true })
+    .then(() => {
+      CART_REPOSITORY.deleteCartItem(cartItemId)
         .then(() => {
-          ElMessage({
-            message: '삭제되었습니다.',
-            type: 'success',
-          })
+          ElMessage.success('성공적으로 삭제되었습니다.')
           router.go(0)
-          // window.location.reload()
         })
-        .catch((error) => {
-          console.error(error)
+        .catch((e) => {
+          console.error(e)
           ElMessage.error('삭제할 수 없습니다.')
         })
     })
@@ -117,52 +126,28 @@ const deleteCartItem = async (cartItemId: number) => {
     })
 }
 
-const cartToOrder = async () => {
-  // if (selectedItems.value.length === 0) {
-  //   ElMessage({
-  //     message: '선택된 상품이 없습니다.',
-  //     type: 'warning'
-  //   })
-  //   return
-  // }
-
-  ElMessageBox.confirm('선택한 상품들을 주문합니다. 결제창으로 이동합니다.', '주문', {
-    type: 'success',
-    confirmButtonText: '확인',
-    cancelButtonText: '취소',
-  }).then(() => {
-    const serializedItems = selectedItems.value.map((item) => ({
-      cartItemId: item.cartItemId,
-      itemName: item.itemName,
-      itemThumnailImage: item.itemThumnailImage,
-      price: item.price,
-      count: item.count,
-      stock: item.stock,
-    }))
-    router.push({
-      name: 'order',
-      state: {
-        tempData: { a: 1, b: 'string', c: true },
-        selectedItems: serializedItems,
-      },
-    })
+const goToOrderPreview = () => {
+  const selectedCartItemIds = state.selectedCartItem.map((cartItem) => cartItem.cartItemId)
+  router.push({
+    name: 'orderPreview',
+    state: {
+      cartItemIds: selectedCartItemIds,
+    },
   })
 }
 
+const handleSelectionChange = (selectedCartItem: CartItem[]) => {
+  state.selectedCartItem = selectedCartItem
+}
+
+const calSelectedCartItemsPrice = () => {
+  return state.selectedCartItem.reduce((total, cartItem) => {
+    return total + cartItem.price * cartItem.count
+  }, 0)
+}
+
 const getImageUrl = (storedName: string) => {
-  return storedName ? `http://localhost:8080/images/${storedName}` : '@element-plus/theme-chalk/el-icon-picture'
-}
-
-const handleSelectionChange = (selectedRows: any) => {
-  selectedItems.value = selectedRows
-}
-
-const getTotalPrice = () => {
-  let totalPrice = 0
-  for (const item of selectedItems.value) {
-    totalPrice += item.price * item.count
-  }
-  return totalPrice
+  return storedName ? `/api/images/${storedName}` : '@element-plus/theme-chalk/el-icon-picture'
 }
 </script>
 
@@ -181,7 +166,10 @@ const getTotalPrice = () => {
   margin-top: 5px;
 }
 
-.cart-order-btn {
-  margin-top: 10px;
+.cartView-footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
 }
 </style>

@@ -8,7 +8,7 @@ import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import java.util.List;
 import java.util.Optional;
 
-public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+public interface CartItemRepository extends JpaRepository<CartItem, Long>, CartItemRepositoryCustom {
 
     Optional<CartItem> findByMemberAndItem(Member member, Item item);
 
