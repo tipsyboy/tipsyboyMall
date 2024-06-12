@@ -1,22 +1,46 @@
 <template>
-  <h3>{{ comments.length }}개의 댓글</h3>
-  <div class="comment-vue">
-    <CommentItem :comment="comment" v-for="comment in comments" :key="comment.id" />
-  </div>
-  <CommentCreate />
+  <h3>{{ state.commentList.contents.length }}개의 댓글</h3>
+
+  <CommentItem :comment="comment" v-for="comment in state.commentList.contents" :key="comment.commentId" />
+
+  <CommentCreate :itemId="props.itemId" />
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import CommentItem from './CommentItem.vue'
 import CommentCreate from './CommentCreate.vue'
+import { container } from 'tsyringe'
+import CommentRepository from '@/repository/CommentRepository'
+import Paging from '@/entity/data/Paging'
+import Comment from '@/entity/comment/Comment'
 
-// Mock comments data
-const comments = ref([
-  { id: 1, author: 'User1', timestamp: '2024-04-03 00:11:00', content: 'This is a comment.' },
-  { id: 2, author: 'User2', timestamp: '2022-03-29 10:05:00', content: 'This is another comment.' },
-  { id: 3, author: '간술맨', timestamp: '2024-03-29 10:05:00', content: 'ㅋㅋ' },
-])
+const COMMENT_REPOSITORY = container.resolve(CommentRepository)
+const props = defineProps<{
+  itemId: number
+}>()
+
+type StateType = {
+  commentList: Paging<Comment>
+}
+
+const state = reactive<StateType>({
+  commentList: new Paging<Comment>(),
+})
+
+onMounted(() => {
+  getCommentList()
+})
+
+const getCommentList = (page = 1) => {
+  COMMENT_REPOSITORY.getCommentList(props.itemId, page)
+    .then((commentList) => {
+      state.commentList = commentList
+    })
+    .catch((e) => {
+      console.error(e)
+    })
+}
 </script>
 
 <style scoped>

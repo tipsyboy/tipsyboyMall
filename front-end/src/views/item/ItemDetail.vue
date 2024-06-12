@@ -12,7 +12,7 @@
     <div class="item-header">
       <h1 class="item-name">{{ state.item.itemName }}</h1>
 
-      <div class="item-btn">
+      <div class="item-btn" v-if="getAuthor() === state.item.seller">
         <el-button type="primary" @click="toEditItem()" :icon="Edit" circle />
         <el-button type="danger" @click="deleteItem()" :icon="Delete" circle />
       </div>
@@ -37,7 +37,9 @@
             <el-input-number v-model="state.cartItemCreateForm.count" :min="1" />
           </el-descriptions-item>
           <el-descriptions-item>
-            <el-button type="info" @click="addToCart(state.item.itemId)" plain>카트에 담기</el-button>
+            <el-button type="info" @click="addToCart(state.item.itemId)" :icon="ShoppingCart" plain>
+              카트에 담기
+            </el-button>
           </el-descriptions-item>
         </el-descriptions>
       </div>
@@ -51,7 +53,7 @@
 
     <el-divider />
 
-    <CommentVue />
+    <CommentVue :itemId="props.itemId" />
   </CenterLayout>
 </template>
 
@@ -59,7 +61,7 @@
 import { markRaw, onMounted, reactive } from 'vue'
 import { container } from 'tsyringe'
 import ItemRepository from '@/repository/ItemRepository'
-import { Delete, Edit, Check } from '@element-plus/icons-vue'
+import { Delete, Edit, Check, ShoppingCart } from '@element-plus/icons-vue'
 import CommentVue from '../comment/CommentVue.vue'
 import Item from '@/entity/item/Item'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -91,7 +93,6 @@ onMounted(() => {
 const getItem = () => {
   ITEM_REPOSITORY.getItem(props.itemId)
     .then((item: Item) => {
-      console.log(item)
       state.item = item
       console.log(state.item)
     })
@@ -151,6 +152,15 @@ const addToCart = (itemId: number) => {
     .catch(() => {
       console.log('장바구니 등록 취소.')
     })
+}
+
+const getAuthor = () => {
+  const profileData = localStorage.getItem('profile')
+  if (profileData !== null) {
+    const profile = JSON.parse(profileData)
+    return profile.nickname
+  }
+  return null
 }
 
 const getImageByFileName = (storedName: string) => {

@@ -1,6 +1,7 @@
 package study.tipsyboy.tipsyboyMall.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.tipsyboy.tipsyboyMall.auth.domain.Member;
@@ -10,6 +11,7 @@ import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.comment.domain.Comment;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentContentEditRequestDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentCreateRequestDto;
+import study.tipsyboy.tipsyboyMall.comment.dto.CommentPagingReqDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentResponseDto;
 import study.tipsyboy.tipsyboyMall.comment.exception.CommentException;
 import study.tipsyboy.tipsyboyMall.comment.exception.CommentExceptionType;
@@ -18,9 +20,7 @@ import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -49,18 +49,18 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
-    public List<CommentResponseDto> readCommentByItem(Long itemId) {
+    public PagingResponse<CommentResponseDto> readCommentByItem(CommentPagingReqDto commentPagingReqDto, Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
 
-        return item.getComments().stream()
-                .map(CommentResponseDto::new)
-                .collect(Collectors.toList());
+        Page<Comment> commentList = commentRepository.getCommentListByItemId(commentPagingReqDto, item);
+
+        return new PagingResponse<>(commentList, CommentResponseDto.class);
     }
 
     @Transactional
-    public Long editCommentContent(CommentContentEditRequestDto requestDto) {
-        Comment comment = commentRepository.findById(requestDto.getCommentId())
+    public Long editCommentContent(Long commentId, CommentContentEditRequestDto requestDto) {
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(CommentExceptionType.COMMENT_NOT_FOUND));
 
         comment.editContent(requestDto.getContent());

@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentContentEditRequestDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentCreateRequestDto;
+import study.tipsyboy.tipsyboyMall.comment.dto.CommentPagingReqDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentResponseDto;
 import study.tipsyboy.tipsyboyMall.comment.service.CommentService;
-
-import java.util.List;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 @Slf4j
-@RequestMapping("/api/comment")
+@RequestMapping("/comments")
 @RequiredArgsConstructor
 @RestController
 public class CommentApiController {
@@ -30,15 +30,16 @@ public class CommentApiController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<List<CommentResponseDto>> readComment(@PathVariable Long itemId) {
-        return ResponseEntity.ok(commentService.readCommentByItem(itemId));
+    public ResponseEntity<PagingResponse<CommentResponseDto>> readComment(@PathVariable Long itemId,
+                                                                          @ModelAttribute CommentPagingReqDto commentPagingReqDto) {
+        return ResponseEntity.ok(commentService.readCommentByItem(commentPagingReqDto, itemId));
     }
 
     @PatchMapping("/{commentId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_MEMBER') && hasPermission(#commentId, 'COMMENT', 'PATCH'))")
     public ResponseEntity<Long> editComment(@PathVariable Long commentId,
                                             @RequestBody CommentContentEditRequestDto requestDto) {
-        return ResponseEntity.ok(commentService.editCommentContent(requestDto));
+        return ResponseEntity.ok(commentService.editCommentContent(commentId, requestDto));
     }
 
     @DeleteMapping("/{commentId}")

@@ -21,7 +21,6 @@ import study.tipsyboy.tipsyboyMall.comment.exception.CommentExceptionType;
 import study.tipsyboy.tipsyboyMall.comment.repository.CommentRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
-import study.tipsyboy.tipsyboyMall.likeitem.repository.LikeItemRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -166,7 +165,6 @@ class CommentApiControllerTest {
         commentRepository.save(comment);
 
         CommentContentEditRequestDto requestDto = CommentContentEditRequestDto.builder()
-                .commentId(comment.getId())
                 .content("수정 후 댓글 내용")
                 .build();
         String json = objectMapper.writeValueAsString(requestDto);
