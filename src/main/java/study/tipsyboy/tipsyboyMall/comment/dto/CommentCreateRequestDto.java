@@ -7,7 +7,9 @@ import lombok.Getter;
 public class CommentCreateRequestDto {
 
     private final Long itemId;
+
     private final Long parentCommentId;
+
     private final String content;
 
     @Builder

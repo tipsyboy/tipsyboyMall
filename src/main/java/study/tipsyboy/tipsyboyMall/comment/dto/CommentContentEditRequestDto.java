@@ -1,17 +1,20 @@
 package study.tipsyboy.tipsyboyMall.comment.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentContentEditRequestDto {
 
-    private final Long commentId;
-    private final String content;
+    private String content;
 
     @Builder
-    public CommentContentEditRequestDto(Long commentId, String content) {
-        this.commentId = commentId;
+    public CommentContentEditRequestDto(String content) {
         this.content = content;
     }
 }
+

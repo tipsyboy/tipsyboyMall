@@ -9,6 +9,10 @@ export default class ProfileRepository {
     localStorage.setItem('profile', JSON.stringify(json))
   }
 
+  public getProfile() {
+    return localStorage.getItem('profile')
+  }
+
   public clearProfile() {
     localStorage.clear()
   }

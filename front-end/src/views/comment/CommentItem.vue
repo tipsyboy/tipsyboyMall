@@ -1,16 +1,26 @@
 <template>
   <div class="comment-container">
     <div class="comment-header">
-      <div class="comment-header_left">{{ comment.author }}</div>
-      <div class="comment-header_right">{{ formatTimestamp(comment.timestamp) }}</div>
+      <div class="comment-header_left">{{ props.comment.author }}</div>
+      <div class="comment-header_right">{{ props.comment.getFormattedDateTime() }}</div>
     </div>
+
     <div class="comment-content">
-      {{ comment.content }}
+      <div v-if="state.isEditing">
+        <el-input v-model="state.commentEditForm.content" type="textarea" resize="none" rows="4"></el-input>
+        <el-button type="primary" @click="editComment">저장</el-button>
+        <el-button @click="changeCommentEdit">취소</el-button>
+      </div>
+      <div v-else>
+        {{ props.comment.content }}
+      </div>
     </div>
-    <div class="comment-util-btn">
-      <el-button type="primary" :icon="Edit" circle />
-      <el-button type="danger" :icon="Delete" circle />
+
+    <div class="comment-util-btn" v-if="getAuthor() === props.comment.author">
+      <el-button type="primary" @click="changeCommentEdit" :icon="Edit" circle />
+      <el-button type="danger" @click="deleteComment" :icon="Delete" circle />
     </div>
+
     <div class="comment-footer">
       <el-button size="small" text>
         추천
@@ -22,40 +32,64 @@
 </template>
 
 <script setup lang="ts">
+import type Comment from '@/entity/comment/Comment'
+import CommentEditForm from '@/entity/comment/CommentEditForm'
+import CommentRepository from '@/repository/CommentRepository'
 import { Delete, Edit } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { container } from 'tsyringe'
+import { markRaw, reactive, ref, type PropType } from 'vue'
+import { useRouter } from 'vue-router'
 
-const { comment } = defineProps<{
-  comment: {
-    id: number
-    author: string
-    timestamp: string
-    content: string
-  }
+const COMMENT_REPOSITORY = container.resolve(CommentRepository)
+const router = useRouter()
+
+const props = defineProps<{
+  comment: Comment | any // ? 왜
 }>()
 
-const formatTimestamp = (timestamp: string) => {
-  const currentTime = new Date()
-  const commentTime = new Date(timestamp)
-  const diffTime = currentTime.getTime() - commentTime.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+type StateType = {
+  commentEditForm: CommentEditForm
+  isEditing: Boolean
+}
+const state = reactive<StateType>({
+  isEditing: false,
+  commentEditForm: new CommentEditForm(props.comment.content),
+})
 
-  if (diffDays > 30) {
-    return commentTime.toISOString().split('T')[0]
-  } else if (diffDays > 0) {
-    return `${diffDays} 일 전`
-  } else {
-    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
-    const diffMinutes = Math.floor(diffTime / (1000 * 60))
-    const diffSeconds = Math.floor(diffTime / 1000)
+const changeCommentEdit = () => {
+  state.isEditing = !state.isEditing
+}
 
-    if (diffHours > 0) {
-      return `${diffHours} 시간 전`
-    } else if (diffMinutes > 0) {
-      return `${diffMinutes} 분 전`
-    } else {
-      return `${diffSeconds} 초 전`
-    }
+const editComment = () => {
+  COMMENT_REPOSITORY.editComment(props.comment.commentId, state.commentEditForm).then(() => {
+    console.log('수정')
+  })
+}
+
+const deleteComment = () => {
+  ElMessageBox.confirm('정말로 삭제하시겠습니까?', '댓글 삭제', {
+    type: 'warning',
+    icon: markRaw(Delete),
+  }).then(() => {
+    COMMENT_REPOSITORY.deleteComment(props.comment.commentId)
+      .then(() => {
+        console.log('삭제가 됨.')
+        router.go(0)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  })
+}
+
+const getAuthor = () => {
+  const profileData = localStorage.getItem('profile')
+  if (profileData !== null) {
+    const profile = JSON.parse(profileData)
+    return profile.nickname
   }
+  return null
 }
 </script>
 
