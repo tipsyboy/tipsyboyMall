@@ -5,6 +5,7 @@ import type FilesForm from '@/entity/file/FilesForm'
 import Item from '@/entity/item/Item'
 import type ItemEditForm from '@/entity/item/ItemEditForm'
 import type Paging from '@/entity/data/Paging'
+import type ItemSearchForm from '@/entity/item/ItemSearchForm'
 
 @singleton()
 export default class ItemRepository {
@@ -85,6 +86,15 @@ export default class ItemRepository {
     return this.httpRepository.getList(
       {
         path: `/api/items/my-items?page=${page}&size=5`,
+      },
+      Item,
+    )
+  }
+
+  public searchItem(page: number, request: ItemSearchForm): Promise<Paging<Item>> {
+    return this.httpRepository.getList(
+      {
+        path: `/api/items?page=${page}&size=10&${request.searchType}=${request.query}`,
       },
       Item,
     )

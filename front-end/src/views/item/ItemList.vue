@@ -23,6 +23,7 @@
         @current-change="(page: number) => getItemList(page)"
       />
     </div>
+    <SearchBar @search="onSearch" />
   </CenterLayout>
 </template>
 
@@ -32,14 +33,20 @@ import Item from '@/entity/item/Item'
 import ItemRepository from '@/repository/ItemRepository'
 import { container } from 'tsyringe'
 import { onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import SearchBar from '@/components/SearchBar.vue'
+import ItemSearchForm from '@/entity/item/ItemSearchForm'
 
 const ITEM_REPOSITORY = container.resolve(ItemRepository)
 const router = useRouter()
+const route = useRoute()
+
 type StateType = {
+  itemSearchForm: ItemSearchForm
   itemList: Paging<Item>
 }
 const state = reactive<StateType>({
+  itemSearchForm: new ItemSearchForm(),
   itemList: new Paging<Item>(),
 })
 
@@ -48,7 +55,11 @@ onMounted(() => {
 })
 
 const getItemList = (page = 1) => {
-  ITEM_REPOSITORY.getItemList(page)
+  const { searchType, query } = route.query
+  state.itemSearchForm.searchType = (searchType as string) || ''
+  state.itemSearchForm.query = (query as string) || ''
+
+  ITEM_REPOSITORY.searchItem(page, state.itemSearchForm)
     .then((itemList) => {
       state.itemList = itemList
     })
@@ -57,15 +68,21 @@ const getItemList = (page = 1) => {
     })
 }
 
+const onSearch = (searchedItemList: Paging<Item>) => {
+  state.itemList = searchedItemList
+  state.itemList.contents = searchedItemList.contents
+}
+
 const toItemDetail = (item: Item) => {
   router.push({ name: 'itemDetail', params: { itemId: item.itemId } })
 }
+
 const formatDateTime = (item: Item) => {
   return item.getFormattedDateTime()
 }
 </script>
 
-<style>
+<style scoped>
 .paging-container {
   display: flex;
   justify-content: center;

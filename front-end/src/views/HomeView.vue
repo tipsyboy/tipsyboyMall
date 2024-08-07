@@ -5,11 +5,12 @@
       <h2 class="header__shop-name" style="color: white">Shop Name</h2>
       <div class="header__search-container">
         <el-input
-          v-model="searchBar"
+          v-model="state.itemSearchForm.query"
           class="search__input"
           size="large"
           placeholder="상품명을 입력하세요."
           :prefix-icon="Search"
+          @keyup.enter="searchItem()"
         />
       </div>
     </div>
@@ -17,12 +18,18 @@
     <!-- main page content -->
     <div class="main-rep-items">
       <el-carousel :interval="5000" type="card" height="380px" indicator-position="outside" :pause-on-hover="true">
-        <el-carousel-item v-for="(item, index) in items" :key="index">
+        <el-carousel-item v-for="(item, index) in state.representativeItemList.contents" :key="index">
           <div class="rep-items__content">
-            <img class="rep-item__image" :src="item.image" alt="Product Image" />
+            <div class="rep-item__image-container" @click="toItemDetail(item.itemId)">
+              <el-image
+                class="rep-item__image"
+                :src="getImageByFileName(item.itemImages[0]?.storedName)"
+                alt="Product Image"
+              />
+            </div>
             <div class="rep-item__info">
-              <h3 class="rep-item__name">{{ item.name }}</h3>
-              <div class="rep-item__price">{{ item.price }}</div>
+              <h3 class="rep-item__name" @click="toItemDetail(item.itemId)">{{ item.itemName }}</h3>
+              <div class="rep-item__price" @click="toItemDetail(item.itemId)">{{ item.price }}</div>
             </div>
           </div>
         </el-carousel-item>
@@ -32,76 +39,49 @@
 </template>
 
 <script setup lang="ts">
+import Paging from '@/entity/data/Paging'
+import Item from '@/entity/item/Item'
+import ItemSearchForm from '@/entity/item/ItemSearchForm'
+import ItemRepository from '@/repository/ItemRepository'
 import { Search } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import SearchBar from '@/components/SearchBar.vue'
+import { container } from 'tsyringe'
+import { onMounted, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 
-const searchBar = ref('')
+const ITEM_REPOSITORY = container.resolve(ItemRepository)
+const router = useRouter()
 
-const items = [
-  {
-    id: 1,
-    name: 'Product 1',
-    description: 'Description of Product 1',
-    price: '$10.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 2,
-    name: 'Product 2',
-    description: 'Description of Product 2',
-    price: '$20.49',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 3,
-    name: 'Product 3',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 4,
-    name: 'Product 4',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 5,
-    name: 'Product 5',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 6,
-    name: 'Product 6',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 7,
-    name: 'Product 7',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 8,
-    name: 'Product 8',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 9,
-    name: 'Product 9',
-    description: 'Description of Product 3',
-    price: '$15.99',
-    image: 'https://via.placeholder.com/150',
-  },
-]
+const state = reactive({
+  itemSearchForm: new ItemSearchForm(),
+  representativeItemList: new Paging<Item>(),
+})
+
+onMounted((page = 1) => {
+  ITEM_REPOSITORY.getItemList(page).then(
+    (representativeItemList) => (state.representativeItemList = representativeItemList),
+  )
+})
+
+const searchItem = (page = 1) => {
+  // ITEM_REPOSITORY.searchItem(page, state.itemSearchForm)
+  //   .then((searchedItemList) => {
+  //     console.log(searchedItemList)
+  //   })
+  //   .catch((e) => console.error(e))
+  router.push({
+    path: '/items',
+    query: { searchType: state.itemSearchForm.searchType, query: state.itemSearchForm.query },
+  })
+}
+
+const toItemDetail = (itemId: number) => {
+  router.push({ name: 'itemDetail', params: { itemId: itemId } })
+}
+
+const getImageByFileName = (storedName: string) => {
+  return storedName ? `/api/images/${storedName}` : '@element-plus/theme-chalk/el-icon-picture'
+}
 </script>
 
 <style scoped>
@@ -143,6 +123,11 @@ const items = [
   align-items: center;
   justify-content: center;
   height: 90%;
+}
+
+.rep-item__image-container {
+  max-width: 200%;
+  max-height: 100%;
 }
 
 .rep-item__image {

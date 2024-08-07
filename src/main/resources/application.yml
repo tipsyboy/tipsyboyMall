@@ -5,15 +5,20 @@ spring:
       enabled: true
       path: /h2-console
 
+  session:
+    store-type: jdbc
+    jdbc.initialize-schema: always
+
   datasource:
-    url: jdbc:h2:mem:tipsyboyMall
+    url: jdbc:h2:tcp://localhost/~/h2db/tmall
     username: sa
     password:
     driver-class-name: org.h2.Driver
 
   jpa:
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
-#        show_sql: true
         format_sql: true
     defer-datasource-initialization: true
