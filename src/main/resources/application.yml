@@ -1,5 +1,6 @@
-
 spring:
+  output.ansi.enabled: always
+
   h2:
     console:
       enabled: true
@@ -16,9 +17,21 @@ spring:
     driver-class-name: org.h2.Driver
 
   jpa:
+#    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
+#        default_batch_fetch_size: 30
         format_sql: true
+        highlight_sql: true
     defer-datasource-initialization: true
+
+#logging.level:
+#  org.hibernate:
+#    type:
+#      descriptor:
+#        sql: trace
+
+logging.level:
+  org.hibernate.SQL: debug

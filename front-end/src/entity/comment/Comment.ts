@@ -1,14 +1,19 @@
 import { DateTimeFormatter, LocalDateTime, ChronoUnit } from '@js-joda/core'
-import { Transform } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 
 export default class Comment {
   public commentId: number = 0
+
+  public itemId: number = 0
 
   public author: string = ''
 
   public content: string = ''
 
   public parentCommentId = null
+
+  @Type(() => Comment)
+  public children: Comment[] = []
 
   @Transform(({ value }) => LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME), {
     toClassOnly: true,

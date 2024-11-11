@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
 import CommentItem from './CommentItem.vue'
 import CommentCreate from './CommentCreate.vue'
 import { container } from 'tsyringe'
@@ -36,6 +36,7 @@ const getCommentList = (page = 1) => {
   COMMENT_REPOSITORY.getCommentList(props.itemId, page)
     .then((commentList) => {
       state.commentList = commentList
+      console.log(state.commentList)
     })
     .catch((e) => {
       console.error(e)
