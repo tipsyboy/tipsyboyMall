@@ -11,7 +11,8 @@ spring:
     jdbc.initialize-schema: always
 
   datasource:
-    url: jdbc:h2:tcp://localhost/~/h2db/tmall
+#    url: jdbc:h2:tcp://localhost/~/h2db/tmall
+    url: jdbc:h2:mem:tipsyboyMall
     username: sa
     password:
     driver-class-name: org.h2.Driver

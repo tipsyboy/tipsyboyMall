@@ -11,10 +11,15 @@ export default class HttpRepository {
   }
 
   public async get<T>(config: HttpRequestConfig, clazz: { new (...args: any[]) }): Promise<T> {
-    return this.httpClient.request({ ...config, method: 'GET' }).then((response) => plainToInstance(clazz, response))
+    return this.httpClient
+      .request({ ...config, method: 'GET' })
+      .then((response) => plainToInstance(clazz, response))
   }
 
-  public async getList<T>(config: HttpRequestConfig, clazz: { new (...args: any[]) }): Promise<Paging<T>> {
+  public async getList<T>(
+    config: HttpRequestConfig,
+    clazz: { new (...args: any[]) },
+  ): Promise<Paging<T>> {
     return this.httpClient.request({ ...config, method: 'GET' }).then((response) => {
       const paging = plainToInstance<Paging<T>, any>(Paging, response)
       const contents = plainToInstance(clazz, response.contents)
@@ -23,19 +28,28 @@ export default class HttpRepository {
     })
   }
 
-  public async post<T>(config: HttpRequestConfig, clazz: { new (...args: any[]) } | null = null): Promise<T> {
+  public async post<T>(
+    config: HttpRequestConfig,
+    clazz: { new (...args: any[]) } | null = null,
+  ): Promise<T> {
     return this.httpClient
       .request({ ...config, method: 'POST' })
       .then((response) => plainToInstance(clazz !== null ? clazz : Null, response))
   }
 
-  public async patch<T>(config: HttpRequestConfig, clazz: { new (...args: any[]) } | null = null): Promise<T> {
+  public async patch<T>(
+    config: HttpRequestConfig,
+    clazz: { new (...args: any[]) } | null = null,
+  ): Promise<T> {
     return this.httpClient
       .request({ ...config, method: 'PATCH' })
       .then((response) => plainToInstance(clazz !== null ? clazz : Null, response))
   }
 
-  public async delete<T>(config: HttpRequestConfig, clazz: { new (...args: any[]) } | null = null): Promise<T> {
+  public async delete<T>(
+    config: HttpRequestConfig,
+    clazz: { new (...args: any[]) } | null = null,
+  ): Promise<T> {
     return this.httpClient
       .request({ ...config, method: 'DELETE' })
       .then((response) => plainToInstance(clazz !== null ? clazz : Null, response))
