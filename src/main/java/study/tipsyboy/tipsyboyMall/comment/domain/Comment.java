@@ -9,6 +9,9 @@ import study.tipsyboy.tipsyboyMall.auth.domain.Member;
 import study.tipsyboy.tipsyboyMall.common.domain.BaseTimeEntity;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -30,6 +33,9 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment; // 부모 댓글
 
+    @OneToMany(mappedBy = "parentComment")
+    private List<Comment> children = new ArrayList<>();
+
     @Column(nullable = false)
     private String content; // 댓글 내용
 
@@ -41,6 +47,9 @@ public class Comment extends BaseTimeEntity {
         mappingItem(item);
         this.author = author;
         this.parentComment = parentComment;
+        if (parentComment != null) {
+            mappingParent(parentComment);
+        }
         this.content = content;
         this.isDeleted = false;
     }
@@ -56,5 +65,9 @@ public class Comment extends BaseTimeEntity {
     private void mappingItem(Item item) {
         item.getComments().add(this);
         this.item = item;
+    }
+
+    private void mappingParent(Comment parent) {
+        parent.children.add(this);
     }
 }
