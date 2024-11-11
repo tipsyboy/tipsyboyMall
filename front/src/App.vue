@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Navbar from '@/components/NavBarComp.vue'
+import Navbar from '@/components/NavbarComp.vue'
 import Footer from '@/components/FooterComp.vue'
 import Content from '@/components/ContentComp.vue'
 </script>
