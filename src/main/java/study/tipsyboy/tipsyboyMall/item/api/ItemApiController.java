@@ -22,6 +22,7 @@ import java.util.List;
 
 
 @Slf4j
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @RestController
 public class ItemApiController {

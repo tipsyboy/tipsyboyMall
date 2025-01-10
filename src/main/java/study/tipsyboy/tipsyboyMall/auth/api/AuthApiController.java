@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import study.tipsyboy.tipsyboyMall.auth.dto.SignupRequestDto;
 import study.tipsyboy.tipsyboyMall.auth.service.AuthService;
 
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @RestController
 public class AuthApiController {

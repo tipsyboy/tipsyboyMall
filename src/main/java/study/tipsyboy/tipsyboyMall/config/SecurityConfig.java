@@ -71,7 +71,7 @@ public class SecurityConfig {
     @Bean
     public AbstractAuthenticationProcessingFilter authenticationProcessingFilter() {
         EmailPasswordAuthenticationFilter filter
-                = new EmailPasswordAuthenticationFilter("/auth/login", objectMapper);
+                = new EmailPasswordAuthenticationFilter("/api/auth/login", objectMapper);
 
         filter.setAuthenticationManager(authenticationManager());
         filter.setAuthenticationSuccessHandler(new LoginSuccessHandler(objectMapper));

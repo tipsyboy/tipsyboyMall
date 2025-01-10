@@ -20,7 +20,7 @@ public class FileController {
 
     private final FileStore fileStore;
 
-    @GetMapping("/images/{filename}")
+    @GetMapping("/api/images/{filename}")
     public ResponseEntity<Resource> downloadFiles(@PathVariable String filename) throws FileNotFoundException {
 
 

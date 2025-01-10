@@ -18,7 +18,7 @@ import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @RestController
 public class OrderApiController {

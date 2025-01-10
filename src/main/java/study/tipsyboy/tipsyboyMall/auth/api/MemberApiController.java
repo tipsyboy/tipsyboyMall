@@ -12,7 +12,7 @@ import study.tipsyboy.tipsyboyMall.auth.dto.LoginMember;
 import study.tipsyboy.tipsyboyMall.auth.dto.MemberInfoResponseDto;
 import study.tipsyboy.tipsyboyMall.auth.service.MemberService;
 
-@RequestMapping("/members")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
 @RestController
 public class MemberApiController {

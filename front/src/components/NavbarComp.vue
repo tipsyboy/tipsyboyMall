@@ -18,8 +18,6 @@ const state = reactive<StateType>({
 
 onBeforeMount(() => {
   MEMBER_REPOSITORY.getProfileByAuth().then((profile) => {
-    console.log(profile)
-
     PROFILE_REPOSITORY.setProfile(profile)
     state.profile = profile
   })

@@ -17,7 +17,7 @@ import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/cartItem")
+@RequestMapping("/api/cartItem")
 @RequiredArgsConstructor
 @RestController
 public class CartItemApiController {

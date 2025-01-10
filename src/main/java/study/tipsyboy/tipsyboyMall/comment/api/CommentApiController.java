@@ -15,7 +15,7 @@ import study.tipsyboy.tipsyboyMall.comment.service.CommentService;
 import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 @Slf4j
-@RequestMapping("/comments")
+@RequestMapping("/api/comments")
 @RequiredArgsConstructor
 @RestController
 public class CommentApiController {
