@@ -44,7 +44,7 @@
 ## 🔍 탐구 생활
 <details>
   <summary>
-    예외 처리 구조 개선
+    ✅ 예외 처리 구조 개선
   </summary>
 
 1. 예외 처리 구조 개선
@@ -72,7 +72,7 @@
 
 <details>
   <summary>
-    JPA와 QueryDsl의 활용
+    ✅ JPA와 QueryDsl의 활용
   </summary>
 
 ### JPA와 QueryDsl의 활용
