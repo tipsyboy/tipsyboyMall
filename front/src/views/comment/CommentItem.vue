@@ -5,22 +5,33 @@
       <div class="comment-header_right">{{ props.comment.getFormattedDateTime() }}</div>
     </div>
 
-    <div class="comment-content">
+    <div class="comment-content" :class="{ 'deleted-comment': props.comment.deleted }">
       <div v-if="state.isEditing">
-        <el-input v-model="state.commentEditForm.content" type="textarea" resize="none" rows="4"></el-input>
+        <el-input
+          v-model="state.commentEditForm.content"
+          type="textarea"
+          resize="none"
+          rows="4"
+        ></el-input>
         <el-button type="primary" @click="editComment">저장</el-button>
         <el-button @click="changeCommentEdit">취소</el-button>
       </div>
       <div v-else>
-        <span v-if="props.comment.parentCommentId" class="parent-badge">@{{ props.comment.author }} </span>
+        <span v-if="props.comment.parentCommentId" class="parent-badge"
+          >@{{ props.comment.parentCommentAuthor }}
+        </span>
         {{ props.comment.content }}
       </div>
     </div>
 
-    <div class="comment-util-btn" v-if="getAuthor() === props.comment.author">
-      <el-button type="info" @click="replyToComment()" :icon="ChatLineRound" circle />
-      <el-button type="primary" @click="changeCommentEdit" :icon="Edit" circle />
-      <el-button type="danger" @click="deleteComment" :icon="Delete" circle />
+    <div class="comment-util-btn">
+      <div>
+        <el-button type="info" @click="replyToComment()" :icon="ChatLineRound" circle />
+      </div>
+      <div v-if="getAuthor() === props.comment.author && !props.comment.deleted">
+        <el-button type="primary" @click="changeCommentEdit" :icon="Edit" circle />
+        <el-button type="danger" @click="deleteComment" :icon="Delete" circle />
+      </div>
     </div>
 
     <div class="comment-footer">
@@ -40,12 +51,17 @@
         rows="4"
         placeholder="대댓글을 입력하세요."
       ></el-input>
-      <el-button type="primary" @click="postRecomment">대댓글 등록</el-button>
-      <el-button @click="replyToComment">취소</el-button>
+      <div class="re-reply-btn">
+        <el-button type="primary" @click="postRecomment">대댓글 등록</el-button>
+        <el-button @click="replyToComment">취소</el-button>
+      </div>
     </div>
     <div v-if="props.comment.children">
-      <!-- <div v-for="child in props.comment.children">자식:{{ child }}</div> -->
-      <CommentItem :comment="child" v-for="child in props.comment.children" :key="child.commentId" />
+      <CommentItem
+        :comment="child"
+        v-for="child in props.comment.children"
+        :key="child.commentId"
+      />
     </div>
   </div>
 </template>
@@ -87,9 +103,13 @@ const changeCommentEdit = () => {
 }
 
 const editComment = () => {
-  COMMENT_REPOSITORY.editComment(props.comment.commentId, state.commentEditForm).then(() => {
-    console.log('수정')
-  })
+  COMMENT_REPOSITORY.editComment(props.comment.commentId, state.commentEditForm)
+    .then(() => {
+      router.go(0)
+    })
+    .catch((e) => {
+      console.error(e)
+    })
 }
 
 const deleteComment = () => {
@@ -157,6 +177,11 @@ const getAuthor = () => {
   padding: 5px 10px;
 }
 
+.comment-util-btn .el-button {
+  margin: 4px;
+  padding: 8px;
+}
+
 .comment-footer {
   padding: 5px 10px;
   display: flex;
@@ -173,6 +198,16 @@ const getAuthor = () => {
 }
 
 .reply-comment {
-  margin-left: 20px; /* 들여쓰기 적용 */
+  margin-left: 20px;
+}
+
+.re-reply-btn {
+  margin-top: 5px;
+  margin-bottom: 50px;
+}
+
+.deleted-comment {
+  color: red;
+  font-style: italic;
 }
 </style>

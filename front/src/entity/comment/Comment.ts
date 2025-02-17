@@ -12,6 +12,10 @@ export default class Comment {
 
   public parentCommentId = null
 
+  public parentCommentAuthor: string = ''
+
+  public deleted: boolean = false
+
   @Type(() => Comment)
   public children: Comment[] = []
 

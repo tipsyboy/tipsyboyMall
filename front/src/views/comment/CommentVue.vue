@@ -1,7 +1,11 @@
 <template>
   <h3>{{ state.commentList.contents.length }}개의 댓글</h3>
 
-  <CommentItem :comment="comment" v-for="comment in state.commentList.contents" :key="comment.commentId" />
+  <CommentItem
+    :comment="comment"
+    v-for="comment in state.commentList.contents"
+    :key="comment.commentId"
+  />
 
   <CommentCreate :itemId="props.itemId" />
 </template>

@@ -23,7 +23,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         List<Comment> commentList = jpaQueryFactory.selectFrom(comment)
                 .where(
                         comment.item.eq(item),
-                        comment.isDeleted.eq(false),
+//                        comment.isDeleted.eq(false),
                         comment.parentComment.isNull()
                 )
 //                .leftJoin(comment.item).fetchJoin()
