@@ -1,6 +1,7 @@
 package study.tipsyboy.tipsyboyMall.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -58,6 +59,10 @@ public class SecurityConfig {
                 .addFilterBefore(
                         authenticationProcessingFilter(),
                         UsernamePasswordAuthenticationFilter.class
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessUrl("/login")
                 )
 
                 .exceptionHandling(exception -> exception
