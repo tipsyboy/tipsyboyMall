@@ -5,11 +5,12 @@
       <strong>주문자</strong>
     </div>
     <div class="orderer-container__right">
-      <span> {{ dummy_nickname }} | {{ dummy_email }} </span>
+      <span> {{ orderCreateForm.orderer }} | {{ orderCreateForm.email }} </span>
     </div>
   </div>
   <el-divider />
 
+  <!-- 배송정보 입력 -->
   <el-tabs v-model="activeTab" type="card">
     <el-tab-pane label="기존 배송 정보" name="existing">
       <div class="delivery-info-container">
@@ -18,7 +19,10 @@
             <div class="input-row">
               <label class="label">수령인</label>
               <div class="input">
-                <el-input v-model="deliveryInfo.receiver" placeholder="이름을 입력하세요" />
+                <el-input
+                  v-model="orderCreateForm.delivery.receiver"
+                  placeholder="이름을 입력하세요"
+                />
               </div>
             </div>
           </li>
@@ -27,8 +31,12 @@
             <div class="input-row">
               <div class="input">
                 <div class="zipcode-input">
-                  <el-input :value="deliveryInfo.zonecode" style="width: 25%" disabled />
-                  <el-button type="primary" @click="postalCodeModalVisible()" style="margin-left: 10px">
+                  <el-input :value="orderCreateForm.delivery.zipcode" style="width: 25%" disabled />
+                  <el-button
+                    type="primary"
+                    @click="postalCodeModalVisible()"
+                    style="margin-left: 10px"
+                  >
                     주소 찾기
                   </el-button>
                 </div>
@@ -39,7 +47,7 @@
             <div class="input-row">
               <label class="label">도로명 주소</label>
               <div class="input">
-                <el-input :value="deliveryInfo.roadAddress" disabled />
+                <el-input :value="orderCreateForm.delivery.roadAddress" disabled />
               </div>
             </div>
           </li>
@@ -47,15 +55,19 @@
             <div class="input-row">
               <label class="label">지번 주소</label>
               <div class="input">
-                <el-input :value="deliveryInfo.jibunAddress" disabled />
+                <el-input :value="orderCreateForm.delivery.jibunAddress" disabled />
               </div>
             </div>
           </li>
+          <!-- 상세 주소 -->
           <li>
             <div class="input-row">
               <label class="label">상세 주소</label>
               <div class="input">
-                <el-input v-model="deliveryInfo.detailAddress" />
+                <el-input
+                  v-model="orderCreateForm.delivery.detailAddress"
+                  placeholder="상세 주소를 입력하세요."
+                />
               </div>
             </div>
           </li>
@@ -64,7 +76,10 @@
             <div class="input-row">
               <label class="label">전화 번호</label>
               <div class="input">
-                <el-input v-model="deliveryInfo.phoneNumber" placeholder="하이픈(-)을 빼고 번호만 입력해주세요" />
+                <el-input
+                  v-model="orderCreateForm.delivery.phoneNumber"
+                  placeholder="하이픈(-)을 빼고 번호만 입력해주세요"
+                />
               </div>
             </div>
           </li>
@@ -83,31 +98,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import OrderCreateForm from '@/entity/order/OrderCreateForm'
+import { ref, inject } from 'vue'
 
 declare global {
   interface Window {
     daum: any
   }
 }
-
 const activeTab = ref('existing')
-const dummy_nickname = '간술맨'
-const dummy_email = 'tipsyboy@gmail.com'
-
-const deliveryInfo = ref({
-  zonecode: '12345',
-  receiver: '간술맨',
-  phoneNumber: '01012345678',
-  roadAddress: '경기 성남시 분당구 판교역로 166',
-  jibunAddress: '경기 성남시 분당구 백현동 532',
-  deliveryNote: '부재 시 경비실에 맡겨주세요.',
-  detailAddress: '102호',
-})
+const orderCreateForm = inject<OrderCreateForm>('orderCreateForm') || new OrderCreateForm()
 
 const modalVisible = ref(false) // 모달 창의 가시성을 관리하기 위한 ref 변수
 const postalCodeModalVisible = () => {
-  modalVisible.value = true // 우편번호 검색 버튼을 클릭하면 모달 창을 엽니다.
+  modalVisible.value = true // 우편번호 검색 버튼을 클릭하면 모달 창 열기
 
   const script = document.createElement('script')
   script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
@@ -137,9 +141,10 @@ const postalCodeModalVisible = () => {
           roadAddr += extraRoadAddr
         }
 
-        deliveryInfo.value.zonecode = data.zonecode
-        deliveryInfo.value.roadAddress = roadAddr
-        deliveryInfo.value.jibunAddress = jibunAddr
+        console.log(data)
+        orderCreateForm.delivery.zipcode = data.zonecode
+        orderCreateForm.delivery.roadAddress = roadAddr
+        orderCreateForm.delivery.jibunAddress = jibunAddr
 
         modalVisible.value = false
       },

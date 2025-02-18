@@ -32,9 +32,13 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Delivery delivery; // 배송 정보
+
     @Builder
-    public Order(OrderStatus orderStatus, List<OrderItem> orderItems, Member member) {
+    public Order(OrderStatus orderStatus, List<OrderItem> orderItems, Member member, Delivery delivery) {
         setMember(member);
+        setDelivery(delivery);
         this.orderStatus = orderStatus;
         for (OrderItem orderItem : orderItems) {
             this.addOrderItems(orderItem);
@@ -59,5 +63,10 @@ public class Order extends BaseTimeEntity {
     private void setMember(Member member) {
         this.member = member;
         member.getOrderList().add(this);
+    }
+
+    private void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        delivery.setOrder(this);
     }
 }

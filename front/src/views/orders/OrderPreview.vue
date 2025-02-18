@@ -18,21 +18,27 @@ import ItemInfo from './components/ItemInfo.vue'
 import PaymentSummary from './components/PaymentSummary.vue'
 import { container } from 'tsyringe'
 import CartRepository from '@/repository/CartRepository'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, provide } from 'vue'
 import CartItem from '@/entity/cart/CartItem'
+import OrderCreateForm from '@/entity/order/OrderCreateForm'
 
 const CART_REPOSITORY = container.resolve(CartRepository)
 
 type StateType = {
+  orderCreateForm: OrderCreateForm
   selectedItem: CartItem[]
 }
 
 const state = reactive<StateType>({
   selectedItem: [] as CartItem[],
+  orderCreateForm: new OrderCreateForm(),
 })
 
 onMounted(() => {
   getCartItem(history.state.cartItemIds)
+  const profile = JSON.parse(localStorage.getItem('profile') || '{}')
+  state.orderCreateForm.orderer = profile.nickname || ''
+  state.orderCreateForm.email = profile.email || ''
 })
 
 const getCartItem = (cartItemIds) => {
@@ -44,6 +50,8 @@ const getCartItem = (cartItemIds) => {
       console.error(e)
     })
 }
+
+provide('orderCreateForm', state.orderCreateForm) // Provide를 사용해서 하위 컴포넌트에서 접근 가능하게 만듦
 </script>
 
 <style scoped>

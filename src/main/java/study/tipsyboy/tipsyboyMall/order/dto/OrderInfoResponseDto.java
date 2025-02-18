@@ -19,8 +19,9 @@ public class OrderInfoResponseDto {
 
     private final List<OrderItemResponseDto> orderItemList;
 
+    private final DeliveryResponseDto orderInfo;
+
     // 총 금액
-    // 배송정보
 
     public OrderInfoResponseDto(Order entity) {
         this.id = entity.getId();
@@ -29,5 +30,6 @@ public class OrderInfoResponseDto {
         this.orderItemList = entity.getOrderItems().stream()
                 .map(OrderItemResponseDto::of)
                 .collect(Collectors.toList());
+        this.orderInfo = DeliveryResponseDto.of(entity.getDelivery());
     }
 }

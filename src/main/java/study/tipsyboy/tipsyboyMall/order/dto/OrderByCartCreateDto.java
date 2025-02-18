@@ -12,9 +12,11 @@ import java.util.List;
 public class OrderByCartCreateDto {
 
     private List<Long> cartItemIds;
+    private DeliveryRequestDto delivery;
 
     @Builder
-    public OrderByCartCreateDto(List<Long> cartItemIds) {
+    public OrderByCartCreateDto(List<Long> cartItemIds, DeliveryRequestDto delivery) {
         this.cartItemIds = cartItemIds;
+        this.delivery = delivery;
     }
 }

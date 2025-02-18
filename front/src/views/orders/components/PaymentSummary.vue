@@ -33,10 +33,11 @@
 <script setup lang="ts">
 import type CartItem from '@/entity/cart/CartItem'
 import OrderCreateForm from '@/entity/order/OrderCreateForm'
+import OrderInfo from '@/entity/order/OrderInfo'
 import OrderRepository from '@/repository/OrderRepository'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { container } from 'tsyringe'
-import { reactive } from 'vue'
+import { inject, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
 const ORDER_REPOSITORY = container.resolve(OrderRepository)
@@ -46,9 +47,11 @@ const props = defineProps<{
   selectedItems: CartItem[]
 }>()
 
-const state = reactive({
-  orderCreateForm: new OrderCreateForm(),
-})
+const orderCreateForm = inject<OrderCreateForm>('orderCreateForm') || new OrderCreateForm()
+
+// const state = reactive({
+//   orderCreateForm: new OrderCreateForm(),
+// })
 
 const getTotalPrice = () => {
   let totalPrice = 0
@@ -80,14 +83,19 @@ const priceFormatter = (price: Number) => {
 }
 
 const handlePayment = () => {
-  ElMessageBox.confirm(`최종 결제 금액 ${priceFormatter(getFinalPrice())}을 결제합니다.`, '결제 확인', {
-    type: 'warning',
-  })
+  ElMessageBox.confirm(
+    `최종 결제 금액 ${priceFormatter(getFinalPrice())}을 결제합니다.`,
+    '결제 확인',
+    {
+      type: 'warning',
+    },
+  )
     .then(() => {
       props.selectedItems.forEach((item) => {
-        state.orderCreateForm.cartItemIds.push(item.cartItemId)
+        orderCreateForm.cartItemIds.push(item.cartItemId)
       })
-      ORDER_REPOSITORY.createOrder(state.orderCreateForm)
+      console.log(orderCreateForm)
+      ORDER_REPOSITORY.createOrder(orderCreateForm)
         .then((orderId: number) => {
           router.push({
             name: 'orderDetail',

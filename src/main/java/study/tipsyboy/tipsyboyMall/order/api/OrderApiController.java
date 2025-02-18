@@ -28,7 +28,7 @@ public class OrderApiController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
     public ResponseEntity<Long> createOrder(@AuthenticationPrincipal LoginMember loginMember,
-                                                            @RequestBody OrderByCartCreateDto orderByCartCreateDto) {
+                                            @RequestBody OrderByCartCreateDto orderByCartCreateDto) {
         return ResponseEntity.ok(orderService.order(loginMember.getMemberId(), orderByCartCreateDto));
     }
 

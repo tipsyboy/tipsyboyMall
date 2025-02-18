@@ -16,14 +16,12 @@ import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
+import study.tipsyboy.tipsyboyMall.order.domain.Delivery;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderPreviewItemResponseDto;
+import study.tipsyboy.tipsyboyMall.order.dto.*;
 import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderByCartCreateDto;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderException;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderExceptionType;
 import study.tipsyboy.tipsyboyMall.response.PagingResponse;
@@ -46,19 +44,22 @@ public class OrderService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
 
-
         List<OrderItem> orderItems = orderByCartCreateDto.getCartItemIds().stream()
                 .map(this::createOrderItem)
                 .collect(Collectors.toList());
+        Delivery delivery = resolveDeliveryInfo(orderByCartCreateDto);
 
         Order order = Order.builder()
                 .member(member)
                 .orderItems(orderItems)
                 .orderStatus(OrderStatus.ORDER)
+                .delivery(delivery)
                 .build();
 
         return orderRepository.save(order).getId();
     }
+
+
 
     public OrderInfoResponseDto findOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -108,5 +109,17 @@ public class OrderService {
         cartItemRepository.delete(cartItem);
 
         return orderItem;
+    }
+
+    private Delivery resolveDeliveryInfo(OrderByCartCreateDto orderByCartCreateDto) {
+        DeliveryRequestDto deliveryInfo = orderByCartCreateDto.getDelivery();
+        return Delivery.builder()
+                .receiver(deliveryInfo.getReceiver())
+                .phoneNumber(deliveryInfo.getPhoneNumber())
+                .zipcode(deliveryInfo.getZipcode())
+                .roadAddress(deliveryInfo.getRoadAddress())
+                .jibunAddress(deliveryInfo.getJibunAddress())
+                .detailAddress(deliveryInfo.getDetailAddress())
+                .build();
     }
 }
