@@ -35,11 +35,16 @@
     </div>
 
     <div class="comment-footer">
-      <el-button size="small" text>
+      <el-button size="small" text @click="likeComment">
         추천
-        <span style="margin-left: 10px">3</span>
+        <span style="margin-left: 10px">{{ props.comment.likeCnt }}</span>
       </el-button>
-      <el-button size="small" text>비추천</el-button>
+      <el-button size="small" text @click="dislikeComment">
+        비추천
+        <span style="margin-left: 10px" v-if="getAuthor() === props.comment.author">
+          {{ props.comment.dislikeCnt }}
+        </span>
+      </el-button>
     </div>
 
     <!-- 대댓글 입력 -->
@@ -73,7 +78,7 @@ import CommentCreateForm from '@/entity/comment/CommentCreateForm'
 import CommentEditForm from '@/entity/comment/CommentEditForm'
 import CommentRepository from '@/repository/CommentRepository'
 import { Delete, Edit, ChatLineRound } from '@element-plus/icons-vue'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { container } from 'tsyringe'
 import { markRaw, reactive } from 'vue'
 import { useRouter } from 'vue-router'
@@ -119,7 +124,6 @@ const deleteComment = () => {
   }).then(() => {
     COMMENT_REPOSITORY.deleteComment(props.comment.commentId)
       .then(() => {
-        console.log('삭제가 됨.')
         router.go(0)
       })
       .catch((e) => {
@@ -139,6 +143,28 @@ const postRecomment = () => {
   COMMENT_REPOSITORY.createComment(state.reCommentCreateForm).then(() => {
     router.go(0)
   })
+}
+
+const likeComment = () => {
+  COMMENT_REPOSITORY.likeComment(props.comment.commentId)
+    .then(() => {
+      props.comment.likeCnt += 1
+      ElMessage.success('댓글 추천 완료')
+    })
+    .catch((e) => {
+      ElMessage.warning(e.message || '댓글 추천 실패.')
+    })
+}
+
+const dislikeComment = () => {
+  COMMENT_REPOSITORY.dislikeComment(props.comment.commentId)
+    .then(() => {
+      props.comment.dislikeCnt += 1
+      ElMessage.success('댓글 비추천 완료')
+    })
+    .catch((e) => {
+      ElMessage.warning(e.message || '댓글 추천 실패.')
+    })
 }
 
 const getAuthor = () => {

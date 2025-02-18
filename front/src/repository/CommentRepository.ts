@@ -43,4 +43,16 @@ export default class CommentRepository {
       path: `/api/comments/${commentId}`,
     })
   }
+
+  public likeComment(commentId: number) {
+    return this.httpRepository.post({
+      path: `/api/comments/${commentId}/like`,
+    })
+  }
+
+  public dislikeComment(commentId: number) {
+    return this.httpRepository.post({
+      path: `/api/comments/${commentId}/dislike`,
+    })
+  }
 }

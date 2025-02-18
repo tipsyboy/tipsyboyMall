@@ -42,6 +42,9 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean isDeleted;
 
+    private int likeCnt;
+    private int dislikeCnt;
+
     @Builder
     public Comment(Member author, Item item, Comment parentComment, String content) {
         mappingItem(item);
@@ -52,6 +55,8 @@ public class Comment extends BaseTimeEntity {
         }
         this.content = content;
         this.isDeleted = false;
+        this.likeCnt = 0;
+        this.dislikeCnt = 0;
     }
 
     public void editContent(String content) {
@@ -70,4 +75,13 @@ public class Comment extends BaseTimeEntity {
     private void mappingParent(Comment parent) {
         parent.children.add(this);
     }
+
+    public void addLikeCnt() {
+        this.likeCnt++;
+    }
+
+    public void addDislikeCnt() {
+        this.dislikeCnt++;
+    }
+
 }

@@ -3,18 +3,18 @@ import { Transform, Type } from 'class-transformer'
 
 export default class Comment {
   public commentId: number = 0
-
   public itemId: number = 0
 
   public author: string = ''
-
   public content: string = ''
 
   public parentCommentId = null
-
   public parentCommentAuthor: string = ''
 
   public deleted: boolean = false
+
+  public likeCnt: number = 0
+  public dislikeCnt: number = 0
 
   @Type(() => Comment)
   public children: Comment[] = []

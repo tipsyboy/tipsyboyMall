@@ -48,4 +48,17 @@ public class CommentApiController {
         return ResponseEntity.ok(commentService.deleteComment(commentId));
     }
 
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<Void> likeComment(@PathVariable Long commentId,
+                                            @AuthenticationPrincipal LoginMember loginMember) {
+        commentService.likeComment(commentId, loginMember.getMemberId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{commentId}/dislike")
+    public ResponseEntity<Void> dislikeComment(@PathVariable Long commentId,
+                                               @AuthenticationPrincipal LoginMember loginMember) {
+        commentService.dislikeComment(commentId, loginMember.getMemberId());
+        return ResponseEntity.ok().build();
+    }
 }

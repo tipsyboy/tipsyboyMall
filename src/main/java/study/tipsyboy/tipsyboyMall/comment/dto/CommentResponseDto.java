@@ -13,22 +13,21 @@ import java.util.stream.Collectors;
 public class CommentResponseDto {
 
     private final Long commentId;
-
     private final Long itemId;
 
     private final String author;
-
     private final String content;
+    private final LocalDateTime createdDate;
 
     private final Long parentCommentId;
-
     private final String parentCommentAuthor;
-
-    private final boolean deleted;
 
     private final List<CommentResponseDto> children = new ArrayList<>();
 
-    private final LocalDateTime createdDate;
+    private final boolean deleted;
+
+    private final int likeCnt;
+    private final int dislikeCnt;
 
     @Builder
     public CommentResponseDto(Comment entity) {
@@ -37,7 +36,8 @@ public class CommentResponseDto {
         this.author = entity.getAuthor().getNickname();
         this.deleted = entity.isDeleted();
         this.content = entity.isDeleted() ? "삭제된 댓글입니다." : entity.getContent();
-
+        this.likeCnt = entity.getLikeCnt();
+        this.dislikeCnt = entity.getDislikeCnt();
 
         if (entity.getParentComment() != null) {
             this.parentCommentId = entity.getParentComment().getId();

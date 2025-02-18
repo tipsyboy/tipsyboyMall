@@ -9,12 +9,14 @@ import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthException;
 import study.tipsyboy.tipsyboyMall.auth.exception.AuthExceptionType;
 import study.tipsyboy.tipsyboyMall.comment.domain.Comment;
+import study.tipsyboy.tipsyboyMall.comment.domain.CommentLike;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentContentEditRequestDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentCreateRequestDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentPagingReqDto;
 import study.tipsyboy.tipsyboyMall.comment.dto.CommentResponseDto;
 import study.tipsyboy.tipsyboyMall.comment.exception.CommentException;
 import study.tipsyboy.tipsyboyMall.comment.exception.CommentExceptionType;
+import study.tipsyboy.tipsyboyMall.comment.repository.CommentLikeRepository;
 import study.tipsyboy.tipsyboyMall.comment.repository.CommentRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
@@ -30,6 +32,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public Long create(Long memberId, CommentCreateRequestDto requestDto) {
@@ -78,13 +81,47 @@ public class CommentService {
         return comment.getId();
     }
 
+    @Transactional
+    public void likeComment(Long commentId, Long memberId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(CommentExceptionType.COMMENT_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                        .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
+        validCommentLike(comment, member);
+
+        commentLikeRepository.save(new CommentLike(comment, member));
+        comment.addLikeCnt();
+    }
+
+
+    @Transactional
+    public void dislikeComment(Long commentId, Long memberId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(CommentExceptionType.COMMENT_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AuthException(AuthExceptionType.AUTH_NOT_FOUND));
+
+        validCommentLike(comment, member);
+
+        commentLikeRepository.save(new CommentLike(comment, member));
+        comment.addDislikeCnt();
+    }
 
     private Comment resolveParentComment(Long parentCommentId) {
         if (parentCommentId == null) {
             return null;
         }
-
         return commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new CommentException(CommentExceptionType.COMMENT_NOT_FOUND));
+    }
+
+    private void validCommentLike(Comment comment, Member member) {
+        if (comment.getAuthor().equals(member)) {
+            throw new CommentException(CommentExceptionType.CANNOT_SELF_LIKE);
+        }
+        if (commentLikeRepository.existsByCommentAndMember(comment, member)) {
+            throw new CommentException(CommentExceptionType.ALREADY_LIKED_COMMENT);
+        }
     }
 }
