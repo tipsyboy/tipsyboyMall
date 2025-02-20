@@ -86,7 +86,7 @@ class CommentApiControllerTest {
         String json = objectMapper.writeValueAsString(requestDto);
 
         // expected
-        mockMvc.perform(post("/api/comment")
+        mockMvc.perform(post("/api/comments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -170,7 +170,7 @@ class CommentApiControllerTest {
         String json = objectMapper.writeValueAsString(requestDto);
 
         // expected
-        mockMvc.perform(patch("/api/comment/{commentId}", comment.getId())
+        mockMvc.perform(patch("/api/comments/{commentId}", comment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -216,7 +216,7 @@ class CommentApiControllerTest {
         // expected
         assertFalse(comment.isDeleted());
 
-        mockMvc.perform(delete("/api/comment/{commentId}", comment.getId())
+        mockMvc.perform(delete("/api/comments/{commentId}", comment.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());

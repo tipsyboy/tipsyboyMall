@@ -12,10 +12,12 @@ import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemResponseDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSaveRequestDto;
+import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemUpdateRequestDto;
 import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.util.List;
 
@@ -153,16 +155,18 @@ class CartItemServiceTest {
         cartItemRepository.save(cartItem3);
 
         // when - '간술맨'의 장바구니를 조회한다.
-        List<CartItemResponseDto> responseDto = cartItemService.readCartItems(buyer1.getId());
+        CartItemSearchReqDto cartItemSearchReqDto = CartItemSearchReqDto.builder()
+                .build();
+        PagingResponse<CartItemResponseDto> response = cartItemService.readCartItems(buyer1.getId(), cartItemSearchReqDto);
 
         // then
         assertEquals(3, cartItemRepository.count()); // 전체 장바구니의 상품은 총 3개
-        assertEquals(2, responseDto.size()); // '간술맨'의 장바구니에는 2개의 상품이 들어있다.
+        assertEquals(2, response.getTotalCount()); // '간술맨'의 장바구니에는 2개의 상품이 들어있다.
 
-        assertEquals(item1.getItemName(), responseDto.get(0).getItemName());
-        assertEquals(cartItem1.getCount(), responseDto.get(0).getCount());
-        assertEquals(item2.getItemName(), responseDto.get(1).getItemName());
-        assertEquals(cartItem2.getCount(), responseDto.get(1).getCount());
+        assertEquals(item2.getItemName(), response.getContents().get(0).getItemName());
+        assertEquals(cartItem2.getCount(), response.getContents().get(0).getCount());
+        assertEquals(item1.getItemName(), response.getContents().get(1).getItemName());
+        assertEquals(cartItem1.getCount(), response.getContents().get(1).getCount());
     }
 
     @Test

@@ -40,7 +40,7 @@ public class CartItemApiController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
     public ResponseEntity<PagingResponse<CartItemResponseDto>> getCartItems(@AuthenticationPrincipal LoginMember loginMember,
-                                                                            CartItemSearchReqDto requestDto) {
+                                                                            @ModelAttribute CartItemSearchReqDto requestDto) {
         return ResponseEntity.ok(cartItemService.readCartItems(loginMember.getMemberId(), requestDto));
     }
 

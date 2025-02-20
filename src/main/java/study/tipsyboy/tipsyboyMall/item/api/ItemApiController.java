@@ -44,6 +44,7 @@ public class ItemApiController {
 
     @GetMapping("/items")
     public ResponseEntity<PagingResponse<ItemResponseDto>> getItems(@ModelAttribute ItemSearchReqDto pagingRequestDto) {
+        log.info("###### page={} #######", pagingRequestDto.getPage());
         return ResponseEntity.ok(itemService.getItemsForPage(pagingRequestDto));
     }
 

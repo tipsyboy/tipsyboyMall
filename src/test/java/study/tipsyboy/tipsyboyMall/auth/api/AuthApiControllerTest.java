@@ -48,7 +48,7 @@ class AuthApiControllerTest {
         String json = objectMapper.writeValueAsString(requestDto);
 
         // expected
-        mockMvc.perform(post("/auth/signup")
+        mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -75,7 +75,7 @@ class AuthApiControllerTest {
         String json = objectMapper.writeValueAsString(requestDto);
 
         // expected
-        mockMvc.perform(post("/auth/signup")
+        mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict())
@@ -102,7 +102,7 @@ class AuthApiControllerTest {
         String json = objectMapper.writeValueAsString(requestDto);
 
         // expected
-        mockMvc.perform(post("/auth/signup")
+        mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict())

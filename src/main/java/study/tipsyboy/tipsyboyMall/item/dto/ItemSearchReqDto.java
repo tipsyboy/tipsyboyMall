@@ -31,6 +31,6 @@ public class ItemSearchReqDto {
     }
 
     public Pageable getPageable() {
-        return PageRequest.of(this.page - 1, this.size);
+        return PageRequest.of(Math.max(1, this.page) - 1, this.size);
     }
 }

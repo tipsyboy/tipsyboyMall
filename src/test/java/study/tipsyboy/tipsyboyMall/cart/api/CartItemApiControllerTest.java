@@ -16,6 +16,7 @@ import study.tipsyboy.tipsyboyMall.auth.domain.MemberRepository;
 import study.tipsyboy.tipsyboyMall.auth.domain.MemberRole;
 import study.tipsyboy.tipsyboyMall.cart.domain.CartItem;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSaveRequestDto;
+import study.tipsyboy.tipsyboyMall.cart.dto.CartItemSearchReqDto;
 import study.tipsyboy.tipsyboyMall.cart.dto.CartItemUpdateRequestDto;
 import study.tipsyboy.tipsyboyMall.cart.repository.CartItemRepository;
 import study.tipsyboy.tipsyboyMall.item.domain.Item;
@@ -122,11 +123,19 @@ class CartItemApiControllerTest {
                 .build();
         cartItemRepository.save(cartItem);
 
+        CartItemSearchReqDto requestDto = CartItemSearchReqDto.builder()
+                .build();
+        String json = objectMapper.writeValueAsString(requestDto);
+
         // expected
         mockMvc.perform(get("/api/cartItem")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].cartItemId").value(cartItem.getId()))
+                .andExpect(jsonPath("$.contents[0].cartItemId").value(cartItem.getId()))
+                .andExpect(jsonPath("$.contents[0].itemName").value(cartItem.getItem().getItemName()))
+                .andExpect(jsonPath("$.contents[0].price").value(cartItem.getItem().getPrice()))
+                .andExpect(jsonPath("$.contents[0].stock").value(cartItem.getItem().getStock()))
                 .andDo(print());
     }
 

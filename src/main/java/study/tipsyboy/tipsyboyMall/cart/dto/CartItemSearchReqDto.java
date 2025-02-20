@@ -1,11 +1,12 @@
 package study.tipsyboy.tipsyboyMall.cart.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 public class CartItemSearchReqDto {
@@ -26,11 +27,15 @@ public class CartItemSearchReqDto {
         return (long) (Math.max(1, this.page) - 1) * Math.min(this.size, MAX_SIZE);
     }
 
-    public Integer getPage() {
-        return Math.max(1, this.page);
-    }
-
     public Pageable getPageable() {
         return PageRequest.of(this.page - 1, this.size);
+    }
+
+    public Integer getPage() {
+        return this.page != null ? this.page : 1;
+    }
+
+    public Integer getSize() {
+        return this.size != null ? Math.min(this.size, MAX_SIZE) : 20;
     }
 }

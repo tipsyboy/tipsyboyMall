@@ -23,6 +23,7 @@ import study.tipsyboy.tipsyboyMall.item.dto.ItemResponseDto;
 import study.tipsyboy.tipsyboyMall.item.dto.ItemUpdateDto;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -215,8 +216,13 @@ class ItemServiceTest {
                 .description("상품 설명 변경")
                 .build();
 
+        List<MultipartFile> imageFiles = List.of(
+                new MockMultipartFile("testImage1", "test1.PNG", MediaType.IMAGE_PNG_VALUE, "test1".getBytes()),
+                new MockMultipartFile("testImage2", "test2.PNG", MediaType.IMAGE_PNG_VALUE, "test2".getBytes())
+        );
+
         // when
-        itemService.edit(item.getId(), itemUpdateDto);
+        itemService.edit(item.getId(), itemUpdateDto, imageFiles);
 
         Item findItem = itemRepository.findById(item.getId())
                 .orElseThrow(() -> new ItemException(ItemExceptionType.ITEM_NOT_FOUND));
@@ -285,13 +291,14 @@ class ItemServiceTest {
                 .page(2)
                 .build();
 
-        Page<ItemResponseDto> findItems = itemService.getItemsForPage(paging);
+        PagingResponse<ItemResponseDto> findItems = itemService.getItemsForPage(paging);
+        findItems.getContents();
 
         // then
         assertEquals(50, itemRepository.count());
-        assertEquals(20, findItems.getContent().size());
-        assertEquals("상품 29", findItems.getContent().get(0).getItemName());
-        assertEquals("상품 10", findItems.getContent().get(findItems.getContent().size() - 1).getItemName());
+        assertEquals(20, findItems.getContents().size());
+        assertEquals("상품 29", findItems.getContents().get(0).getItemName());
+        assertEquals("상품 10", findItems.getContents().get(findItems.getContents().size() - 1).getItemName());
     }
 
 //    @Test
@@ -378,12 +385,12 @@ class ItemServiceTest {
                 .page(1)
                 .title("벤츠")
                 .build();
-        Page<ItemResponseDto> searchItems = itemService.getItemsForPage(searchReqDto);
+        PagingResponse<ItemResponseDto> searchItems = itemService.getItemsForPage(searchReqDto);
 
         // then
         assertEquals(5, itemRepository.count());
-        assertEquals(2, searchItems.getContent().size());
-        for (ItemResponseDto searchedItem : searchItems) {
+        assertEquals(2, searchItems.getContents().size());
+        for (ItemResponseDto searchedItem : searchItems.getContents()) {
             assertTrue(searchedItem.getItemName().contains("벤츠"));
         }
     }
@@ -424,12 +431,12 @@ class ItemServiceTest {
                 .page(1)
                 .seller("혼술맨")
                 .build();
-        Page<ItemResponseDto> searchItems = itemService.getItemsForPage(searchReqDto);
+        PagingResponse<ItemResponseDto> searchItems = itemService.getItemsForPage(searchReqDto);
 
         // then
         assertEquals(5, itemRepository.count());
-        assertEquals(2, searchItems.getContent().size());
-        for (ItemResponseDto searchedItem : searchItems) {
+        assertEquals(2, searchItems.getContents().size());
+        for (ItemResponseDto searchedItem : searchItems.getContents()) {
             assertTrue(searchedItem.getSeller().contains("혼술맨"));
         }
     }

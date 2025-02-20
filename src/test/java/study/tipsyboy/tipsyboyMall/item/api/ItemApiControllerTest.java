@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -74,7 +75,7 @@ class ItemApiControllerTest {
                 json.getBytes(StandardCharsets.UTF_8));
 
         // expected
-        mockMvc.perform(multipart("/items")
+        mockMvc.perform(multipart("/api/items")
                         .file(jsonToMultipart)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                 )
@@ -111,7 +112,7 @@ class ItemApiControllerTest {
         itemRepository.save(item);
 
         // expected
-        mockMvc.perform(get("/items/{itemId}", item.getId())
+        mockMvc.perform(get("/api/items/{itemId}", item.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.itemName").value("상품"))
@@ -145,12 +146,12 @@ class ItemApiControllerTest {
         itemRepository.saveAll(items);
 
         // expected
-        mockMvc.perform(get("/items?page=2&size=20")
+        mockMvc.perform(get("/api/items?page=2&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()", is(20)))
-                .andExpect(jsonPath("$.content[0].itemName").value("상품 29"))
-                .andExpect(jsonPath("$.content[19].itemName").value("상품 10"))
+                .andExpect(jsonPath("$.contents.length()", is(20)))
+                .andExpect(jsonPath("$.contents[0].itemName").value("상품 29"))
+                .andExpect(jsonPath("$.contents[19].itemName").value("상품 10"))
                 .andDo(print());
     }
 
@@ -178,12 +179,12 @@ class ItemApiControllerTest {
         itemRepository.saveAll(items);
 
         // expected
-        mockMvc.perform(get("/items?page=-1&size=20")
+        mockMvc.perform(get("/api/items?page=-1&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()", is(20)))
-                .andExpect(jsonPath("$.content[0].itemName").value("상품 49"))
-                .andExpect(jsonPath("$.content[19].itemName").value("상품 30"))
+                .andExpect(jsonPath("$.contents.length()", is(20)))
+                .andExpect(jsonPath("$.contents[0].itemName").value("상품 49"))
+                .andExpect(jsonPath("$.contents[19].itemName").value("상품 30"))
                 .andDo(print());
     }
 
@@ -200,7 +201,7 @@ class ItemApiControllerTest {
         String json = objectMapper.writeValueAsString(itemCreateDto);
 
         // expected
-        mockMvc.perform(post("/items")
+        mockMvc.perform(post("/api/items")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest())
@@ -211,7 +212,7 @@ class ItemApiControllerTest {
     @DisplayName("존재 하지 않는 상품을 조회한다.")
     public void readNotFoundItem() throws Exception {
         // expected
-        mockMvc.perform(get("/items/{itemId}", 1L)
+        mockMvc.perform(get("/api/items/{itemId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andDo(print());
@@ -239,10 +240,19 @@ class ItemApiControllerTest {
                 .build();
         String json = objectMapper.writeValueAsString(itemUpdateDto);
 
+        // JSON 데이터를 MultipartFile로 변환 (컨트롤러의 @RequestPart("itemUpdateDto")와 이름 일치)
+        MockMultipartFile itemUpdateDtoPart = new MockMultipartFile(
+                "itemUpdateDto",  // 컨트롤러의 @RequestPart("itemUpdateDto")와 동일해야 함
+                "",
+                "application/json",
+                objectMapper.writeValueAsBytes(itemUpdateDto)  //  JSON을 바이트 배열로 변환
+        );
+
         // expected
-        mockMvc.perform(patch("/items/{itemId}", item.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+        mockMvc.perform(multipart(HttpMethod.PATCH, "/api/items/{itemId}", item.getId())
+                        .file(itemUpdateDtoPart)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        )
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -264,7 +274,7 @@ class ItemApiControllerTest {
         itemRepository.save(item);
 
         // expected
-        mockMvc.perform(delete("/items/{itemId}", item.getId())
+        mockMvc.perform(delete("/api/items/{itemId}", item.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -307,13 +317,13 @@ class ItemApiControllerTest {
         itemRepository.saveAll(items2);
 
         // expected
-        mockMvc.perform(get("/items/my-items?page=0&size=20")
+        mockMvc.perform(get("/api/items/my-items?page=0&size=20")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(20)))
-                .andExpect(jsonPath("$[0].itemName").value("상품 29"))
-                .andExpect(jsonPath("$[19].itemName").value("상품 10"))
-                .andExpect(jsonPath("$[*].seller", everyItem(equalTo("간술맨"))))
+                .andExpect(jsonPath("$.contents.length()", is(20)))
+                .andExpect(jsonPath("$.contents[0].itemName").value("상품 29"))
+                .andExpect(jsonPath("$.contents[19].itemName").value("상품 10"))
+                .andExpect(jsonPath("$.contents[*].seller", everyItem(equalTo("간술맨"))))
                 .andDo(print());
     }
 
@@ -336,10 +346,10 @@ class ItemApiControllerTest {
         itemRepository.save(item4);
         itemRepository.save(item5);
 
-        mockMvc.perform(get("/items?page=1&size=20&title=벤츠")
+        mockMvc.perform(get("/api/items?page=1&size=20&title=벤츠")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()", is(2)))
+                .andExpect(jsonPath("$.contents.length()", is(2)))
                 .andDo(print());
     }
 
@@ -369,10 +379,10 @@ class ItemApiControllerTest {
         itemRepository.save(item4);
         itemRepository.save(item5);
 
-        mockMvc.perform(get("/items?page=1&size=20&seller=혼술맨")
+        mockMvc.perform(get("/api/items?page=1&size=20&seller=혼술맨")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()", is(3)))
+                .andExpect(jsonPath("$.contents.length()", is(3)))
                 .andDo(print());
     }
 }

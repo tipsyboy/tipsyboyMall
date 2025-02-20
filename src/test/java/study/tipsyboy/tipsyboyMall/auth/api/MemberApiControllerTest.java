@@ -54,7 +54,7 @@ class MemberApiControllerTest {
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(get("/members/profile/{memberId}", member.getId())
+        mockMvc.perform(get("/api/members/profile/{memberId}", member.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
@@ -75,7 +75,7 @@ class MemberApiControllerTest {
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(get("/members/profile/{nickname}", member.getNickname())
+        mockMvc.perform(get("/api/members/profile/{nickname}", member.getNickname())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
@@ -99,7 +99,7 @@ class MemberApiControllerTest {
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(get("/members/profile/{nickname}", member.getNickname())
+        mockMvc.perform(get("/api/members/profile/{nickname}", member.getNickname())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))

@@ -14,16 +14,15 @@ import study.tipsyboy.tipsyboyMall.item.domain.Item;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemException;
 import study.tipsyboy.tipsyboyMall.item.exception.ItemExceptionType;
 import study.tipsyboy.tipsyboyMall.item.repository.ItemRepository;
+import study.tipsyboy.tipsyboyMall.order.domain.Delivery;
 import study.tipsyboy.tipsyboyMall.order.domain.Order;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderItem;
 import study.tipsyboy.tipsyboyMall.order.domain.OrderStatus;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderByCartCreateDto;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderInfoResponseDto;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderItemResponseDto;
-import study.tipsyboy.tipsyboyMall.order.dto.OrderPagingRequestDto;
+import study.tipsyboy.tipsyboyMall.order.dto.*;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderException;
 import study.tipsyboy.tipsyboyMall.order.exception.OrderExceptionType;
 import study.tipsyboy.tipsyboyMall.order.repository.OrderRepository;
+import study.tipsyboy.tipsyboyMall.response.PagingResponse;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -105,7 +104,11 @@ class OrderServiceTest {
 
         // when
         List<Long> cartItemIds = List.of(cartItem1.getId(), cartItem3.getId());
+        DeliveryRequestDto deliveryRequestDto = new DeliveryRequestDto(
+                "간술맨", "01012345678", "1234",
+                "1234", "1234", "1234");
         OrderByCartCreateDto orderByCartCreateDto = OrderByCartCreateDto.builder()
+                .delivery(deliveryRequestDto)
                 .cartItemIds(cartItemIds)
                 .build();
         orderService.order(member.getId(), orderByCartCreateDto);
@@ -201,10 +204,12 @@ class OrderServiceTest {
                         .count(1)
                         .build());
 
+        Delivery delivery = Delivery.builder().build();
         Order order = Order.builder()
                 .member(member)
                 .orderItems(orderItems)
                 .orderStatus(OrderStatus.ORDER)
+                .delivery(delivery)
                 .build();
         orderRepository.save(order);
 
@@ -245,13 +250,19 @@ class OrderServiceTest {
                 .build();
         cartItemRepository.save(cartItem);
 
+
+        DeliveryRequestDto deliveryRequestDto = new DeliveryRequestDto(
+                "간술맨", "01012345678", "1234",
+                "1234", "1234", "1234");
         OrderByCartCreateDto createDto = OrderByCartCreateDto.builder()
                 .cartItemIds(List.of(cartItem.getId()))
+                .delivery(deliveryRequestDto)
                 .build();
-        OrderInfoResponseDto responseDto = orderService.order(member.getId(), createDto);
+
+        Long orderId = orderService.order(member.getId(), createDto);
 
         // when - 주문 취소
-        orderService.cancelOrder(responseDto.getId());
+        orderService.cancelOrder(orderId);
 
         // then - 상품의 재고가 복구되어야 한다.
         Item restoredItem = itemRepository.findById(item.getId())
@@ -285,10 +296,12 @@ class OrderServiceTest {
                 .orderPrice(item.getPrice())
                 .count(1)
                 .build();
+        Delivery delivery = Delivery.builder().build();
         Order order = Order.builder()
                 .member(member)
                 .orderItems(List.of(orderItem))
                 .orderStatus(OrderStatus.ORDER)
+                .delivery(delivery)
                 .build();
         orderRepository.save(order);
 
@@ -337,6 +350,9 @@ class OrderServiceTest {
                 .build();
         itemRepository.save(item);
 
+        List<Delivery> deliveries = IntStream.range(0, 50)
+                .mapToObj(i -> Delivery.builder().build())
+                .toList();
         List<OrderItem> orderItems = IntStream.range(0, 50)
                 .mapToObj(i -> OrderItem.builder()
                         .item(item)
@@ -349,6 +365,7 @@ class OrderServiceTest {
                         .member(member)
                         .orderItems(List.of(orderItems.get(i)))
                         .orderStatus(OrderStatus.ORDER)
+                        .delivery(deliveries.get(i))
                         .build())
                 .collect(Collectors.toList());
         orderRepository.saveAll(savedOrders);
@@ -358,9 +375,9 @@ class OrderServiceTest {
                 .page(2)
                 .size(20)
                 .build();
-        List<OrderInfoResponseDto> orderList = orderService.findOrderListByMemberId(pagingRequestDto, member.getId());
+        PagingResponse<OrderInfoResponseDto> orderList = orderService.findOrderListByMemberId(pagingRequestDto, member.getId());
 
         // then
-        assertEquals(20, orderList.size());
+        assertEquals(20, orderList.getSize());
     }
 }
