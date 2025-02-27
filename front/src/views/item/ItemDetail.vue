@@ -1,7 +1,10 @@
 <template>
   <CenterLayout>
     <div class="item-images">
-      <el-empty :image-size="150" v-if="!state.item.itemImages || state.item.itemImages.length === 0" />
+      <el-empty
+        :image-size="150"
+        v-if="!state.item.itemImages || state.item.itemImages.length === 0"
+      />
       <el-carousel v-else indicator-position="outside" :pause-on-hover="true" height="430px">
         <el-carousel-item v-for="(itemImage, index) in state.item.itemImages" :key="index">
           <img class="item-image" :src="getImageByFileName(itemImage.storedName)" />
@@ -24,7 +27,9 @@
       <div class="item-info-left">
         <el-descriptions :column="1" size="large">
           <el-descriptions-item label="판매자">{{ state.item.seller }}</el-descriptions-item>
-          <el-descriptions-item label="가격">{{ state.item.price }}</el-descriptions-item>
+          <el-descriptions-item label="가격">
+            {{ formatCurrency(state.item.price) }} 원
+          </el-descriptions-item>
           <el-descriptions-item label="재고">{{ state.item.stock }}</el-descriptions-item>
           <el-descriptions-item>{{ state.item.getFormattedDateTime() }}</el-descriptions-item>
         </el-descriptions>
@@ -68,6 +73,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import CartItemCreateForm from '@/entity/cart/CartItemCreateForm'
 import CartRepository from '@/repository/CartRepository'
+import { formatCurrency } from '@/utils/utils'
 
 const ITEM_REPOSITORY = container.resolve(ItemRepository)
 const CART_REPOSITORY = container.resolve(CartRepository)
@@ -136,10 +142,14 @@ const addToCart = (itemId: number) => {
 
       CART_REPOSITORY.addToCart(state.cartItemCreateForm)
         .then((cartItemId) => {
-          ElMessageBox.confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?', '장바구니', {
-            type: 'success',
-            icon: markRaw(Check),
-          })
+          ElMessageBox.confirm(
+            '장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?',
+            '장바구니',
+            {
+              type: 'success',
+              icon: markRaw(Check),
+            },
+          )
             .then(() => {
               router.push('/cart')
             })
@@ -186,6 +196,7 @@ const getImageByFileName = (storedName: string) => {
 
 .item-description {
   margin-top: 20px;
+  white-space: pre-line;
 }
 .el-carousel__item .item-image {
   width: 100%;

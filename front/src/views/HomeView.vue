@@ -17,8 +17,17 @@
 
     <!-- main page content -->
     <div class="main-rep-items">
-      <el-carousel :interval="5000" type="card" height="380px" indicator-position="outside" :pause-on-hover="true">
-        <el-carousel-item v-for="(item, index) in state.representativeItemList.contents" :key="index">
+      <el-carousel
+        :interval="5000"
+        type="card"
+        height="380px"
+        indicator-position="outside"
+        :pause-on-hover="true"
+      >
+        <el-carousel-item
+          v-for="(item, index) in state.representativeItemList.contents"
+          :key="index"
+        >
           <div class="rep-items__content">
             <div class="rep-item__image-container" @click="toItemDetail(item.itemId)">
               <el-image
@@ -29,7 +38,9 @@
             </div>
             <div class="rep-item__info">
               <h3 class="rep-item__name" @click="toItemDetail(item.itemId)">{{ item.itemName }}</h3>
-              <div class="rep-item__price" @click="toItemDetail(item.itemId)">{{ item.price }}</div>
+              <div class="rep-item__price" @click="toItemDetail(item.itemId)">
+                ₩ {{ formatCurrency(item.price) }}
+              </div>
             </div>
           </div>
         </el-carousel-item>
@@ -44,10 +55,10 @@ import Item from '@/entity/item/Item'
 import ItemSearchForm from '@/entity/item/ItemSearchForm'
 import ItemRepository from '@/repository/ItemRepository'
 import { Search } from '@element-plus/icons-vue'
-import SearchBar from '@/components/SearchBar.vue'
 import { container } from 'tsyringe'
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { formatCurrency } from '@/utils/utils'
 
 const ITEM_REPOSITORY = container.resolve(ItemRepository)
 const router = useRouter()
