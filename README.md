@@ -23,11 +23,11 @@
   - [x] 역할 기반 접근 제어 
 
 - 상품
-  - [x] 상품 등록, 수정, 삭제, 조회 기능
-  - [x] 이미지 업로드 기능 구현 - Multipart File 처리
+  - [x] 상품 등록, 수정, 삭제, 조회
+  - [x] 이미지 업로드 기능 - Multipart File 처리
   - [x] 상품 상태 관리 / 주문 관리 
   - [x] 댓글 / 대댓글 기능 구현
-  - [x] 댓글 추천/비추천 기능
+  - [x] 댓글 추천 / 비추천 기능
 
 - 검색 및 필터링
    - [x] 검색 기능 구현
@@ -57,12 +57,67 @@
 - 예외 처리 로직을 통합하여 중복 코드를 제거하고 응답 형식을 일관성 있게 구성.
 - REST API 에러 응답을 표준화(HTTP 상태 코드 + 에러 메시지 + 추가 정보).
 
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> baseExceptionHandler(BaseException e) {
+        // ...
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> validException(MethodArgumentNotValidException e) {
+        // ...
+    }
+}
+```
+
 3. 구현 과정
 - 프로젝트 내에서 발생 가능한 예외들을 정리.
 - 예외들에 대해 각각의 커스텀 예외 클래스 작성.
 - @RestControllerAdvice를 활용해 예외를 일괄 처리하는 글로벌 핸들러 구현.
 - 프로젝트 내 공통 에러 응답.
 - 기존 코드에 산재된 try-catch 블록을 제거하고 예외를 일관된 방식으로 처리.
+
+```java
+@Getter
+public class AuthException extends BaseException {
+
+    public AuthException(ExceptionType exceptionType) {
+        super(exceptionType);
+    }
+
+}
+```
+
+```java
+public enum AuthExceptionType implements ExceptionType {
+
+    // 404
+    AUTH_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
+
+    // 409
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록되어 있는 이메일입니다."),
+    NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록되어 있는 닉네임입니다.");
+
+    private final HttpStatus statusCode;
+    private final String message;
+
+    AuthExceptionType(HttpStatus statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
+    }
+
+    @Override
+    public HttpStatus statusCode() {
+        return this.statusCode;
+    }
+
+    @Override
+    public String message() {
+        return this.message;
+    }
+}
+```
 
 4. 성과
 - 예외 처리 로직의 가독성, 유지보수성, 확장성이 크게 향상.
