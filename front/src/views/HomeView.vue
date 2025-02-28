@@ -2,13 +2,13 @@
   <div class="main-container">
     <!-- main page header -->
     <div class="main-header">
-      <h2 class="header__shop-name" style="color: white">Shop Name</h2>
+      <h2 class="header__shop-name" style="color: white">책책책 책을 읽읍시다</h2>
       <div class="header__search-container">
         <el-input
           v-model="state.itemSearchForm.query"
           class="search__input"
           size="large"
-          placeholder="상품명을 입력하세요."
+          placeholder="검색어를 입력하세요."
           :prefix-icon="Search"
           @keyup.enter="searchItem()"
         />
@@ -139,12 +139,13 @@ const getImageByFileName = (storedName: string) => {
 .rep-item__image-container {
   max-width: 200%;
   max-height: 100%;
+  overflow: hidden;
 }
 
 .rep-item__image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .rep-item__name {
